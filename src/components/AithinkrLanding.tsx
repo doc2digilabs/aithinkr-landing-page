@@ -15,13 +15,13 @@ const AithinkrLanding = () => {
           <div className="mr-4 flex">
             <a className="mr-6 flex items-center space-x-2" href="/">
               <Brain className="h-6 w-6 text-primary" />
-              <span className="hidden font-bold sm:inline-block">AiThinkr</span>
+              <span className="hidden font-bold sm:inline-block text-3xl">AiThinkr</span>
             </a>
           </div>
           <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
             <nav className="flex items-center space-x-6 text-sm font-medium">
               <a href="#about" className="transition-colors hover:text-primary">About</a>
-              <a href="#features" className="transition-colors hover:text-primary">Departments</a>
+              <a href="#  " className="transition-colors hover:text-primary">Departments</a>
               <a href="#showcase" className="transition-colors hover:text-primary">Projects</a>
               <a href="#careers" className="transition-colors hover:text-primary">Careers</a>
             </nav>
@@ -73,14 +73,10 @@ const AithinkrLanding = () => {
               
               <div className="flex items-center space-x-8 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-2 group">
-                  <div className="flex -space-x-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 border-2 border-background group-hover:scale-110 transition-transform duration-200"></div>
-                    <div className="w-8 h-8 rounded-full bg-primary-glow/20 border-2 border-background group-hover:scale-110 transition-transform duration-200 delay-75"></div>
-                    <div className="w-8 h-8 rounded-full bg-accent border-2 border-background group-hover:scale-110 transition-transform duration-200 delay-150"></div>
-                  </div>
-                  <span className="group-hover:text-foreground transition-colors duration-200">10k+ users</span>
+                  
+                  <span className="group-hover:text-foreground transition-colors duration-200"></span>
                 </div>
-                <div className="hover:text-foreground transition-colors duration-200 cursor-default">⭐ 4.9/5 rating</div>
+                <div className="hover:text-foreground transition-colors duration-200 cursor-default"></div>
               </div>
             </div>
             
@@ -104,7 +100,7 @@ const AithinkrLanding = () => {
         
         <div className="container">
           <div className="text-center mb-16">
-            <Badge variant="secondary" className="mb-4 animate-scale-in hover:shadow-lifted transition-all duration-300">
+            <Badge variant="secondary" className="mb-4 animate-scale-in hover:shadow-lifted transition-all duration-300 text-xl">
               Our Mission
             </Badge>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-6 animate-fade-in-up">
@@ -120,7 +116,7 @@ const AithinkrLanding = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-8 animate-slide-in-left">
               <div className="space-y-4 group">
-                <h3 className="text-2xl font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
+                <h3 className="text-2xl font-semibold text-foreground group-hover:text-primary transition-colors duration-300 ">
                   Our Vision
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
@@ -167,7 +163,7 @@ const AithinkrLanding = () => {
       <section id="features" className="py-24">
         <div className="container">
           <div className="text-center mb-16">
-            <Badge variant="secondary" className="mb-4">Our Departments</Badge>
+            <Badge variant="secondary" className="mb-4 text-xl">Our Departments</Badge>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
               Four Pillars of Innovation
             </h2>
@@ -245,7 +241,7 @@ const AithinkrLanding = () => {
       <section id="showcase" className="py-24 bg-gradient-subtle">
         <div className="container">
           <div className="text-center mb-16">
-            <Badge variant="secondary" className="mb-4">Our Work</Badge>
+            <Badge variant="secondary" className="mb-4 text-2xl">Our Work</Badge>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
               Transforming Ideas into Reality
             </h2>
@@ -329,7 +325,7 @@ const AithinkrLanding = () => {
       <section id="careers" className="py-24">
         <div className="container">
           <div className="text-center mb-16">
-            <Badge variant="secondary" className="mb-4">Join Our Team</Badge>
+            <Badge variant="secondary" className="mb-4 text-xl">Join Our Team</Badge>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
               Shape the Future of AI
             </h2>
