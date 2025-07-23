@@ -47,8 +47,9 @@ const AithinkrLanding = () => {
                   Start Your Journey
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
                 </Button>
-                <Button variant="outline" size="lg" className="text-lg px-8 hover:shadow-lifted transition-all duration-300 hover:-translate-y-1">
-                  Watch Demo
+                <Button variant="outline" size="lg" className="text-lg px-8 group hover:shadow-floating transition-all duration-300 hover:-translate-y-1">
+                  Learn More
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
                 </Button>
               </div>
               
@@ -144,7 +145,7 @@ const AithinkrLanding = () => {
       <section id="features" className="py-24">
         <div className="container">
           <div className="text-center mb-16">
-            <Badge variant="secondary" className="mb-4 text-xl">Our Departments</Badge>
+            <Badge variant="secondary" className="mb-4 text-xl">Our Company</Badge>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
               Four Pillars of Innovation
             </h2>
