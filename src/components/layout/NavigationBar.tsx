@@ -72,7 +72,7 @@ export function NavigationBar() {
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <Link to="/" className={navigationMenuTriggerStyle()}>
+                <Link to="/training" className={navigationMenuTriggerStyle()}>
                   Training
                 </Link>
               </NavigationMenuItem>
@@ -129,7 +129,7 @@ export function NavigationBar() {
               </Link>
               <Link to="/#about" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">About</Link>
               <div className="space-y-2">
-                <h4 className="font-semibold">Departments</h4>
+                <h4 className="font-semibold">Company</h4>
                 {companyStructure.map((component) => (
                   <Link
                     key={component.title}
