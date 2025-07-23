@@ -5,33 +5,14 @@ import { ArrowRight, Brain, Users, Lightbulb, Target, Mail, Phone, MapPin, Githu
 import heroImage from "@/assets/hero-aithinkr.jpg";
 import teamImage from "@/assets/team-collaboration.jpg";
 import featuresImage from "@/assets/features-icons.jpg";
+import { Link } from "react-router-dom";
+import { NavigationBar } from "@/components/layout/NavigationBar";
+  
 
 const AithinkrLanding = () => {
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center">
-          <div className="mr-4 flex">
-            <a className="mr-6 flex items-center space-x-2" href="/">
-              <Brain className="h-6 w-6 text-primary" />
-              <span className="hidden font-bold sm:inline-block text-3xl">AiThinkr</span>
-            </a>
-          </div>
-          <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-            <nav className="flex items-center space-x-6 text-sm font-medium">
-              <a href="#about" className="transition-colors hover:text-primary">About</a>
-              <a href="#  " className="transition-colors hover:text-primary">Departments</a>
-              <a href="#showcase" className="transition-colors hover:text-primary">Projects</a>
-              <a href="#careers" className="transition-colors hover:text-primary">Careers</a>
-            </nav>
-            <Button size="sm" className="ml-4">
-              Get Started
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <NavigationBar />
 
       {/* Hero Section */}
       <section className="relative py-24 lg:py-8 overflow-hidden">
@@ -186,6 +167,14 @@ const AithinkrLanding = () => {
                   Pioneering AI research that pushes the boundaries of what's possible. 
                   From machine learning to neural networks.
                 </CardDescription>
+                <div className="mt-4">
+                  <Link
+                    to="/research"
+                    className="inline-block px-4 py-2 rounded bg-primary text-white font-semibold shadow hover:bg-primary/90 transition-colors duration-200"
+                  >
+                    Explore Research
+                  </Link>
+                </div>
               </CardContent>
             </Card>
 
@@ -201,6 +190,14 @@ const AithinkrLanding = () => {
                   Transforming research into practical, user-friendly products that 
                   solve real-world problems.
                 </CardDescription>
+                <div className="mt-4">
+                  <Link
+                    to="/products"
+                    className="inline-block px-4 py-2 rounded bg-primary text-white font-semibold shadow hover:bg-primary/90 transition-colors duration-200"
+                  >
+                    Explore Products
+                  </Link>
+                </div>
               </CardContent>
             </Card>
 
@@ -216,6 +213,14 @@ const AithinkrLanding = () => {
                   Comprehensive education programs to help individuals and organizations 
                   harness the power of AI.
                 </CardDescription>
+                <div className="mt-4">
+                  <Link
+                    to="/training"
+                    className="inline-block px-4 py-2 rounded bg-primary text-white font-semibold shadow hover:bg-primary/90 transition-colors duration-200"
+                  >
+                    Explore Training
+                  </Link>
+                </div>
               </CardContent>
             </Card>
 
@@ -231,6 +236,14 @@ const AithinkrLanding = () => {
                   Dedicated support and partnership development to ensure success 
                   for every client and user.
                 </CardDescription>
+                <div className="mt-4">
+                  <Link
+                    to="/support"
+                    className="inline-block px-4 py-2 rounded bg-primary text-white font-semibold shadow hover:bg-primary/90 transition-colors duration-200"
+                  >
+                    Explore Support
+                  </Link>
+                </div>
               </CardContent>
             </Card>
           </div>
