@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Brain, Menu, ArrowRight, Bot, Code, Users, GraduationCap } from "lucide-react";
 
-const departments: { title: string; href: string; description: string, icon: React.ElementType }[] = [
+const companyStructure: { title: string; href: string; description: string, icon: React.ElementType }[] = [
   {
     title: "Research",
     href: "/research",
@@ -62,10 +62,25 @@ export function NavigationBar() {
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuTrigger>Departments</NavigationMenuTrigger>
+                <Link to="/research" className={navigationMenuTriggerStyle()}>
+                  Research
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link to="/product" className={navigationMenuTriggerStyle()}>
+                  Products
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link to="/" className={navigationMenuTriggerStyle()}>
+                  Training
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Company</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                    {departments.map((component) => (
+                    {companyStructure.map((component) => (
                       <ListItem
                         key={component.title}
                         title={component.title}
@@ -79,12 +94,7 @@ export function NavigationBar() {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <Link to="/#showcase" className={navigationMenuTriggerStyle()}>
-                  Projects
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link to="/#careers" className={navigationMenuTriggerStyle()}>
+                <Link to="/careers" className={navigationMenuTriggerStyle()}>
                   Careers
                 </Link>
               </NavigationMenuItem>
@@ -120,7 +130,7 @@ export function NavigationBar() {
               <Link to="/#about" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">About</Link>
               <div className="space-y-2">
                 <h4 className="font-semibold">Departments</h4>
-                {departments.map((component) => (
+                {companyStructure.map((component) => (
                   <Link
                     key={component.title}
                     to={component.href}
@@ -133,7 +143,8 @@ export function NavigationBar() {
                 ))}
               </div>
               <Link to="/#showcase" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Projects</Link>
-              <Link to="/#careers" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Careers</Link>
+              <Link to="/products" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Products</Link>
+              <Link to="/careers" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Careers</Link>
             </nav>
           </SheetContent>
         </Sheet>

@@ -164,8 +164,7 @@ const AithinkrLanding = () => {
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-base leading-relaxed group-hover:text-foreground transition-colors duration-300">
-                  Pioneering AI research that pushes the boundaries of what's possible. 
-                  From machine learning to neural networks.
+                Pioneering the future of AI with cutting-edge research and development.
                 </CardDescription>
                 <div className="mt-4">
                   <Link

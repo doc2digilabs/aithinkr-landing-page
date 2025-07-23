@@ -7,6 +7,14 @@ import useScrollToTop from "./hooks/useScrollToTop";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Training from "./pages/training"; // Add this import
+import Careers from "./pages/careers";
+import Products from "./pages/products";
+import Research from "./pages/research";
+import Blog from "./pages/blog";
+
+
+
+
 
 const queryClient = new QueryClient();
 
@@ -16,6 +24,10 @@ const AppContent = () => {
     <Routes>
       <Route path="/" element={<Index />} />
       <Route path="/training" element={<Training />} /> {/* Add this line */}
+      <Route path="/careers" element={<Careers />} />
+      <Route path="/products" element={<Products />} />
+      <Route path="/research" element={<Research />} />
+      <Route path="/blog" element={<Blog />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>
