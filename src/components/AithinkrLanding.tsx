@@ -15,13 +15,13 @@ const AithinkrLanding = () => {
           <div className="mr-4 flex">
             <a className="mr-6 flex items-center space-x-2" href="/">
               <Brain className="h-6 w-6 text-primary" />
-              <span className="hidden font-bold sm:inline-block">Aithinkr</span>
+              <span className="hidden font-bold sm:inline-block">AiThinkr</span>
             </a>
           </div>
           <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
             <nav className="flex items-center space-x-6 text-sm font-medium">
               <a href="#about" className="transition-colors hover:text-primary">About</a>
-              <a href="#features" className="transition-colors hover:text-primary">Features</a>
+              <a href="#features" className="transition-colors hover:text-primary">Departments</a>
               <a href="#showcase" className="transition-colors hover:text-primary">Projects</a>
               <a href="#careers" className="transition-colors hover:text-primary">Careers</a>
             </nav>
@@ -34,7 +34,7 @@ const AithinkrLanding = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative py-24 lg:py-32 overflow-hidden">
+      <section className="relative py-24 lg:py-8 overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0">
           <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-gradient-mesh rounded-full blur-3xl opacity-20 animate-float"></div>
@@ -111,7 +111,7 @@ const AithinkrLanding = () => {
               Bridging Human Intelligence with AI
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed animate-fade-in-up delay-200">
-              At Aithinkr, we believe that the future lies in the seamless collaboration between 
+              At AiThinkr, we believe that the future lies in the seamless collaboration between 
               human creativity and artificial intelligence. Our platform democratizes access to 
               advanced AI tools, making them accessible to everyone.
             </p>
@@ -132,7 +132,7 @@ const AithinkrLanding = () => {
               
               <div className="space-y-6 group">
                 <h3 className="text-2xl font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
-                  Why Choose Aithinkr?
+                  Why Choose AiThinkr?
                 </h3>
                 <ul className="space-y-4 text-muted-foreground">
                   <li className="flex items-center space-x-3 group hover:text-foreground transition-all duration-300 hover:translate-x-2">
@@ -366,17 +366,17 @@ const AithinkrLanding = () => {
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center space-x-2">
                   <Target className="h-5 w-5 text-primary" />
-                  <span>Product Manager</span>
+                  <span>Product Internship</span>
                 </CardTitle>
                 <CardDescription>
-                  Drive product strategy and development for our AI platform suite.
+                  Build product for our AI platform suite.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex gap-2 flex-wrap mb-4">
                   <Badge variant="outline">Full-time</Badge>
                   <Badge variant="outline">Hybrid</Badge>
-                  <Badge variant="outline">Mid-level</Badge>
+                  <Badge variant="outline">Junior-level</Badge>
                 </div>
                 <Button variant="outline" className="w-full">
                   Apply Now
@@ -390,7 +390,7 @@ const AithinkrLanding = () => {
               Don't see a role that fits? We're always looking for talented individuals.
             </p>
             <Button variant="outline">
-              View All Openings
+              Contact us
             </Button>
           </div>
         </div>
@@ -403,7 +403,7 @@ const AithinkrLanding = () => {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Brain className="h-6 w-6 text-primary" />
-                <span className="font-bold text-lg">Aithinkr</span>
+                <span className="font-bold text-lg">AiThinkr</span>
               </div>
               <p className="text-muted-foreground text-sm">
                 Empowering minds with AI to think smarter and innovate faster.
@@ -444,18 +444,18 @@ const AithinkrLanding = () => {
                 </li>
                 <li className="flex items-center space-x-2">
                   <Phone className="h-4 w-4" />
-                  <span>+1 (555) 123-4567</span>
+                  <span>+91 9007915334</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <MapPin className="h-4 w-4" />
-                  <span>San Francisco, CA</span>
+                  <span>Kolkata, India</span>
                 </li>
               </ul>
             </div>
           </div>
 
           <div className="border-t mt-12 pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; 2024 Aithinkr. All rights reserved. Built with React and deployed on Netlify.</p>
+            <p>&copy; 2025 AiThinkr. All rights reserved.</p>
           </div>
         </div>
       </footer>
