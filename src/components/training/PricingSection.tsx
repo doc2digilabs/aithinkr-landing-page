@@ -71,6 +71,15 @@ const PricingSection = () => {
             </div>
           </div>
           
+          {/* Student Discount Section */}
+          <div className="mt-8 bg-gradient-to-r from-primary to-primary-glow p-8 rounded-2xl shadow-lg text-center text-primary-foreground">
+            <h3 className="text-3xl font-bold mb-2">Are you a Student?</h3>
+            <p className="text-lg mb-4">We offer a 50% discount for students. Contact us to learn more.</p>
+            <Button variant="secondary" size="lg">
+              Get Student Discount
+            </Button>
+          </div>
+
           {/* Batch Information */}
           <div className="mt-8 grid md:grid-cols-3 gap-6">
             <div className="bg-gradient-card rounded-xl p-6 shadow-tech border border-border text-center">
