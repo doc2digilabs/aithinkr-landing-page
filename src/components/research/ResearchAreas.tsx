@@ -2,30 +2,30 @@ import { Brain, Code, Users, Zap } from "lucide-react";
 
 const researchAreas = [
   {
-    title: "Language Models",
+    title: "Document Digitization",
     description:
-      "We are working on developing the next generation of large language models that are more powerful, efficient, and safe.",
+      "We are developing advanced AI models for document digitization, enabling efficient data extraction and processing from various document formats.",
     icon: Brain,
     color: "text-blue-500",
   },
   {
-    title: "Multimodal AI",
+    title: "Multimodal AI for regional languages",
     description:
-      "We are building AI models that can understand and generate not just text, but also images, audio, and video.",
+      "We are developing multimodal AI models that can understand and generate content in regional languages, enhancing accessibility and usability.",
     icon: Code,
     color: "text-cyan-500",
   },
   {
-    title: "AI for Science",
+    title: "AI for Education",
     description:
-      "We are using AI to accelerate scientific discovery in areas such as drug discovery, materials science, and climate change.",
+      "We are developing AI solutions to enhance the learning experience, including personalized learning, intelligent tutoring systems, and educational content generation.",
     icon: Zap,
     color: "text-indigo-500",
   },
   {
-    title: "AI Safety",
+    title: "AI Healthcare",
     description:
-      "We are committed to developing AI that is safe, ethical, and beneficial to society. We are working on a range of technical and policy challenges to ensure that AI is developed and used responsibly.",
+      " We are developing AI solutions to improve healthcare outcomes, including diagnostics, patient care, and healthcare administration.",
     icon: Users,
     color: "text-purple-500",
   },

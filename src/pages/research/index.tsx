@@ -13,7 +13,7 @@ const ResearchPage = () => {
       <main>
         <HeroSection />
         <ResearchAreas />
-        <Publications />
+        {/* <Publications /> */}
         <JoinUs />
       </main>
       <Footer />

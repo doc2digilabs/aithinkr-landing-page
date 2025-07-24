@@ -1,23 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
-const publications = [
-  {
-    title: "Generative Pre-trained Transformer 4",
-    authors: "OpenAI",
-    conference: "NeurIPS 2023",
-  },
-  {
-    title: "Mastering the Game of Go with Deep Neural Networks and Tree Search",
-    authors: "DeepMind",
-    conference: "Nature 2016",
-  },
-  {
-    title: "Attention Is All You Need",
-    authors: "Google",
-    conference: "NeurIPS 2017",
-  },
-];
+// const publications = [
+//   {
+//     title: "Generative Pre-trained Transformer 4",
+//     authors: "OpenAI",
+//     conference: "NeurIPS 2023",
+//   },
+//   {
+//     title: "Mastering the Game of Go with Deep Neural Networks and Tree Search",
+//     authors: "DeepMind",
+//     conference: "Nature 2016",
+//   },
+//   {
+//     title: "Attention Is All You Need",
+//     authors: "Google",
+//     conference: "NeurIPS 2017",
+//   },
+// ];
 
 const Publications = () => {
   return (
@@ -32,7 +32,9 @@ const Publications = () => {
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto">
+        
+
+        {/* <div className="max-w-4xl mx-auto">
           <div className="bg-gradient-card rounded-xl shadow-tech border border-border">
             {publications.map((publication, index) => (
               <div
@@ -53,7 +55,7 @@ const Publications = () => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );
