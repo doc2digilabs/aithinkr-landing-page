@@ -4,7 +4,7 @@ import HeroSection from "@/components/careers/HeroSection";
 import WhyJoinUs from "@/components/careers/WhyJoinUs";
 import OpenPositions from "@/components/careers/OpenPositions";
 import OurCulture from "@/components/careers/OurCulture";
-import Footer from "@/components/careers/Footer";
+import Footer from "@/components/layout/Footer";
 
 const CareersPage = () => {
   return (

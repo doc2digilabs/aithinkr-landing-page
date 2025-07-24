@@ -5,7 +5,7 @@ import Features from "@/components/products/Features";
 import UseCases from "@/components/products/UseCases";
 import Integrations from "@/components/products/Integrations";
 import CTA from "@/components/products/CTA";
-import Footer from "@/components/products/Footer";
+import Footer from "@/components/layout/Footer";
 
 const ProductPage = () => {
   return (

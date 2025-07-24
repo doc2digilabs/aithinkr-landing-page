@@ -4,7 +4,7 @@ import HeroSection from "@/components/about/HeroSection";
 import OurMission from "@/components/about/OurMission";
 import OurTeam from "@/components/about/OurTeam";
 import OurValues from "@/components/about/OurValues";
-import Footer from "@/components/about/Footer";
+import Footer from "@/components/layout/Footer";
 
 const AboutPage = () => {
   return (

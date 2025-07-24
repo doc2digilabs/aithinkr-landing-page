@@ -27,9 +27,9 @@ const AithinkrLanding = () => {
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-20 items-center">
             <div className="space-y-8 animate-fade-in-up">
               <div className="space-y-6">
-                <Badge variant="secondary" className="w-fit animate-bounce-gentle shadow-lifted">
+                {/* <Badge variant="secondary" className="w-fit animate-bounce-gentle shadow-lifted">
                   🚀 Now in Beta
-                </Badge>
+                </Badge> */}
                 <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl leading-tight">
                   Think Smarter,{" "}
                   <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent animate-glow-pulse">
@@ -43,14 +43,12 @@ const AithinkrLanding = () => {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="text-lg px-8 group hover:shadow-floating transition-all duration-300 hover:-translate-y-1">
-                  Start Your Journey
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
-                </Button>
-                <Button variant="outline" size="lg" className="text-lg px-8 group hover:shadow-floating transition-all duration-300 hover:-translate-y-1">
-                  Learn More
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
-                </Button>
+                <Link to="/about">
+                  <Button variant="outline" size="lg" className="text-lg px-8 group hover:shadow-floating transition-all duration-300 hover:-translate-y-1">
+                    Learn More
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
+                  </Button>
+                </Link>
               </div>
               
               <div className="flex items-center space-x-8 text-sm text-muted-foreground">
@@ -348,58 +346,11 @@ const AithinkrLanding = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <Card className="p-6 hover:shadow-elegant transition-all duration-300">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center space-x-2">
-                  <Brain className="h-5 w-5 text-primary" />
-                  <span>AI Research Scientist</span>
-                </CardTitle>
-                <CardDescription>
-                  Lead cutting-edge research in machine learning and AI. PhD preferred.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-2 flex-wrap mb-4">
-                  <Badge variant="outline">Full-time</Badge>
-                  <Badge variant="outline">Remote</Badge>
-                  <Badge variant="outline">Senior</Badge>
-                </div>
-                <Button variant="outline" className="w-full">
-                  Apply Now
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="p-6 hover:shadow-elegant transition-all duration-300">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center space-x-2">
-                  <Target className="h-5 w-5 text-primary" />
-                  <span>Product Internship</span>
-                </CardTitle>
-                <CardDescription>
-                  Build product for our AI platform suite.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-2 flex-wrap mb-4">
-                  <Badge variant="outline">Full-time</Badge>
-                  <Badge variant="outline">Hybrid</Badge>
-                  <Badge variant="outline">Junior-level</Badge>
-                </div>
-                <Button variant="outline" className="w-full">
-                  Apply Now
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
+          
           <div className="text-center mt-12">
-            <p className="text-muted-foreground mb-4">
-              Don't see a role that fits? We're always looking for talented individuals.
-            </p>
             <Button variant="outline">
-              Contact us
+              Expolre Careers
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
         </div>

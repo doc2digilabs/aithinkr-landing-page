@@ -6,7 +6,7 @@ import WhoShouldJoin from "@/components/training/WhoShouldJoin"
 import CareerOutcomes from "@/components/training/CareerOutcomes"
 import Testimonials from "@/components/training/Testimonials"
 import PricingSection from "@/components/training/PricingSection"
-import Footer from "@/components/training/Footer"
+import Footer from "@/components/layout/Footer";
 import Header from "@/components/training/Header"
 import HeroSection from "@/components/training/HeroSection"
 

@@ -45,6 +45,11 @@ export function NavigationBar() {
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
+                <Link to="/training" className={navigationMenuTriggerStyle()}>
+                  Training
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
                 <Link to="/blog" className={navigationMenuTriggerStyle()}>
                   Blog
                 </Link>
@@ -90,14 +95,7 @@ export function NavigationBar() {
               <Link to="/careers" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Careers</Link>
             </nav>
           </SheetContent>
-        </Sheet>
-
-        <div className="flex flex-1 items-center justify-end space-x-2">
-          <Button size="sm" className="ml-4">
-            Get Started
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
+        </Sheet>        
       </div>
     </header>
   );

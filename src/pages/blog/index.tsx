@@ -2,7 +2,7 @@
 import Header from "@/components/blog/Header";
 import HeroSection from "@/components/blog/HeroSection";
 import BlogPosts from "@/components/blog/BlogPosts";
-import Footer from "@/components/blog/Footer";
+import Footer from "@/components/layout/Footer";
 
 const BlogPage = () => {
   return (
