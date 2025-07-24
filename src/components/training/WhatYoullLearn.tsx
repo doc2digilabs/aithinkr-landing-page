@@ -57,7 +57,7 @@ const modules = [
 
 const WhatYoullLearn = () => {
   return (
-    <section className="py-20 bg-gradient-tech">
+    <section className="py-8 bg-gradient-tech">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">
@@ -105,7 +105,7 @@ const WhatYoullLearn = () => {
           })}
         </div>
         
-        <div className="mt-12 text-center">
+        {/* <div className="mt-12 text-center">
           <div className="inline-flex items-center gap-4 bg-gradient-card rounded-lg p-4 shadow-tech">
             <Brain className="w-8 h-8 text-primary" />
             <div className="text-left">
@@ -113,7 +113,7 @@ const WhatYoullLearn = () => {
               <div className="text-sm text-muted-foreground">Build 12+ real projects throughout the bootcamp</div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   )

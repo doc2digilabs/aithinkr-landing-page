@@ -39,8 +39,8 @@ const PricingSection = () => {
                 </div>
                 
                 <div className="flex items-center justify-center gap-4 mb-4">
-                  <span className="text-2xl text-muted-foreground line-through">$4,999</span>
-                  <span className="text-5xl md:text-6xl font-bold text-foreground">$2,999</span>
+                  <span className="text-2xl text-muted-foreground line-through">Rs.20,000</span>
+                  <span className="text-5xl md:text-6xl font-bold text-foreground">Rs.10,000</span>
                 </div>
                 
                 <p className="text-muted-foreground mb-6">
@@ -50,7 +50,7 @@ const PricingSection = () => {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
                   <Button variant="hero" size="xl" className="font-semibold">
                     <CreditCard className="w-5 h-5" />
-                    Enroll Now - Save $2,000
+                    Enroll Now - Save Rs.10,000
                   </Button>
                   <Button variant="outline" size="xl">
                     <Calendar className="w-5 h-5" />
@@ -76,8 +76,8 @@ const PricingSection = () => {
             <div className="bg-gradient-card rounded-xl p-6 shadow-tech border border-border text-center">
               <Calendar className="w-8 h-8 text-primary mx-auto mb-3" />
               <h3 className="font-semibold mb-2">Next Batch Starts</h3>
-              <p className="text-2xl font-bold text-primary">March 15, 2025</p>
-              <p className="text-sm text-muted-foreground mt-1">Limited to 25 students</p>
+              <p className="text-2xl font-bold text-primary">September 1st, 2025</p>
+              <p className="text-sm text-muted-foreground mt-1">Limited to 35 students</p>
             </div>
             
             <div className="bg-gradient-card rounded-xl p-6 shadow-tech border border-border text-center">
@@ -90,13 +90,13 @@ const PricingSection = () => {
             <div className="bg-gradient-card rounded-xl p-6 shadow-tech border border-border text-center">
               <Users className="w-8 h-8 text-primary mx-auto mb-3" />
               <h3 className="font-semibold mb-2">Class Size</h3>
-              <p className="text-lg font-bold">Max 25 Students</p>
+              <p className="text-lg font-bold">Max 30 Students</p>
               <p className="text-sm text-muted-foreground mt-1">Personalized attention guaranteed</p>
             </div>
           </div>
           
           {/* Payment Options */}
-          <div className="mt-8 bg-gradient-card rounded-xl p-6 shadow-tech border border-border">
+          {/* <div className="mt-8 bg-gradient-card rounded-xl p-6 shadow-tech border border-border">
             <h3 className="font-semibold mb-4 text-center">Flexible Payment Options</h3>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="text-center p-4 bg-background rounded-lg border border-border">
@@ -110,7 +110,7 @@ const PricingSection = () => {
                 <p className="text-sm text-muted-foreground">0% interest • No credit check</p>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
