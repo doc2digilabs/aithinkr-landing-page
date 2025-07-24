@@ -16,33 +16,6 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Brain, Menu, ArrowRight, Bot, Code, Users, GraduationCap } from "lucide-react";
 
-const companyStructure: { title: string; href: string; description: string, icon: React.ElementType }[] = [
-  {
-    title: "Research",
-    href: "/research",
-    description: "Pioneering the future of AI with cutting-edge research and development.",
-    icon: Bot
-  },
-  {
-    title: "Product Development",
-    href: "/products",
-    description: "Building innovative and user-friendly AI-powered applications.",
-    icon: Code
-  },
-  {
-    title: "Training",
-    href: "/training",
-    description: "Empowering individuals and teams with comprehensive AI training programs.",
-    icon: GraduationCap
-  },
-  {
-    title: "Customer Relations",
-    href: "/support",
-    description: "Providing dedicated support and fostering successful partnerships.",
-    icon: Users
-  },
-];
-
 export function NavigationBar() {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -57,8 +30,13 @@ export function NavigationBar() {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <Link to="/#about" className={navigationMenuTriggerStyle()}>
+                <Link to="/about" className={navigationMenuTriggerStyle()}>
                   About
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link to="/products" className={navigationMenuTriggerStyle()}>
+                  Products
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
@@ -67,31 +45,9 @@ export function NavigationBar() {
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <Link to="/product" className={navigationMenuTriggerStyle()}>
-                  Products
+                <Link to="/blog" className={navigationMenuTriggerStyle()}>
+                  Blog
                 </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link to="/training" className={navigationMenuTriggerStyle()}>
-                  Training
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>Company</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                    {companyStructure.map((component) => (
-                      <ListItem
-                        key={component.title}
-                        title={component.title}
-                        href={component.href}
-                        icon={component.icon}
-                      >
-                        {component.description}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link to="/careers" className={navigationMenuTriggerStyle()}>
@@ -127,23 +83,10 @@ export function NavigationBar() {
                 <Brain className="h-6 w-6 text-primary" />
                 <span>AiThinkr</span>
               </Link>
-              <Link to="/#about" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">About</Link>
-              <div className="space-y-2">
-                <h4 className="font-semibold">Company</h4>
-                {companyStructure.map((component) => (
-                  <Link
-                    key={component.title}
-                    to={component.href}
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    <component.icon className="h-4 w-4" />
-                    {component.title}
-                  </Link>
-                ))}
-              </div>
-              <Link to="/#showcase" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Projects</Link>
+              <Link to="/about" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">About</Link>
               <Link to="/products" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Products</Link>
+              <Link to="/research" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Research</Link>
+              <Link to="/blog" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Blog</Link>
               <Link to="/careers" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Careers</Link>
             </nav>
           </SheetContent>

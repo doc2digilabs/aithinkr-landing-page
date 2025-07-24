@@ -11,6 +11,8 @@ import Careers from "./pages/careers";
 import Products from "./pages/products";
 import Research from "./pages/research";
 import Blog from "./pages/blog";
+import About from "./pages/about";
+
 
 
 
@@ -28,6 +30,7 @@ const AppContent = () => {
       <Route path="/products" element={<Products />} />
       <Route path="/research" element={<Research />} />
       <Route path="/blog" element={<Blog />} />
+      <Route path="/about" element={<About />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>
