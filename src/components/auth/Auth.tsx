@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabaseClient";
-import RegistrationForm from "@/components/register/RegistrationForm";
+import { CreateAccountForm } from "./CreateAccountForm";
 import { CheckCircle, AlertCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
@@ -150,7 +150,7 @@ export function Auth() {
           </Card>
         </TabsContent>
         <TabsContent value="create-account">
-          <RegistrationForm />
+          <CreateAccountForm />
         </TabsContent>
       </Tabs>
     </div>

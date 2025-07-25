@@ -41,8 +41,13 @@ export function NavigationBar() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      if (_event === 'SIGNED_IN') {
-        navigate('/dashboard');
+      if (_event === 'SIGNED_IN' && session) {
+        // Check if the user's name is in their metadata, which indicates a complete profile.
+        if (session.user.user_metadata?.name) {
+          navigate('/dashboard');
+        } else {
+          navigate('/complete-profile');
+        }
       }
       if (_event === 'SIGNED_OUT') {
         navigate('/auth');

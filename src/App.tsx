@@ -12,7 +12,6 @@ import Products from "./pages/products";
 import Research from "./pages/research";
 import Blog from "./pages/blog";
 import About from "./pages/about";
-import Register from "./pages/register";
 import AuthPage from "./pages/auth";
 import ProfilePage from "./pages/profile";
 import ForgotPasswordPage from "./pages/forgot-password";
@@ -21,6 +20,7 @@ import PrivacyPolicyPage from "./pages/privacy-policy";
 import TermsOfServicePage from "./pages/terms-of-service";
 import DashboardPage from "./pages/dashboard";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import CompleteProfilePage from "./pages/complete-profile";
 
 const queryClient = new QueryClient();
 
@@ -35,7 +35,6 @@ const AppContent = () => {
       <Route path="/research" element={<Research />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/about" element={<About />} />
-      <Route path="/register" element={<Register />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -46,6 +45,7 @@ const AppContent = () => {
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/complete-profile" element={<CompleteProfilePage />} />
       </Route>
 
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

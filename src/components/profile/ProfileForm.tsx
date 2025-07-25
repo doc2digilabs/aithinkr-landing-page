@@ -9,6 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabaseClient";
 import { Session } from "@supabase/supabase-js";
@@ -23,6 +25,14 @@ const ProfileForm = () => {
   });
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [completeness, setCompleteness] = useState(0);
+
+  const calculateCompleteness = (data: { name: string | null, phone_no: string | null }) => {
+    let calculatedCompleteness = 50; // Base for having an account
+    if (data.name) calculatedCompleteness += 25;
+    if (data.phone_no) calculatedCompleteness += 25;
+    setCompleteness(calculatedCompleteness);
+  };
 
   useEffect(() => {
     const getSession = async () => {
@@ -49,10 +59,12 @@ const ProfileForm = () => {
             icon: <AlertCircle className="h-5 w-5" />,
           });
         } else if (data) {
-          setFormData({
-            name: data.name || "",
-            phone_no: data.phone_no || "",
-          });
+          const profileData = { name: data.name || "", phone_no: data.phone_no || "" };
+          setFormData(profileData);
+          calculateCompleteness(profileData);
+        } else {
+          // Handle case where there's no registration record yet
+          calculateCompleteness({ name: null, phone_no: null });
         }
         setLoading(false);
       };
@@ -91,6 +103,7 @@ const ProfileForm = () => {
         description: "Your information has been successfully updated.",
         icon: <Save className="h-5 w-5" />,
       });
+      calculateCompleteness(formData); // Recalculate on successful update
     }
     setLoading(false);
   };
@@ -130,7 +143,7 @@ const ProfileForm = () => {
     setLoading(false);
   };
 
-  if (loading && !formData.name) {
+  if (loading && completeness === 0) {
     return <p>Loading profile...</p>;
   }
 
@@ -142,6 +155,14 @@ const ProfileForm = () => {
           <CardDescription>Update your personal details here.</CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="space-y-2 mb-6">
+            <div className="flex justify-between items-center mb-1">
+              <Label>Profile Completeness</Label>
+              <span className="text-sm font-medium text-muted-foreground">{completeness}%</span>
+            </div>
+            <Progress value={completeness} className="w-full" />
+          </div>
+          <Separator className="mb-6" />
           <form onSubmit={handleUpdateProfile} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
