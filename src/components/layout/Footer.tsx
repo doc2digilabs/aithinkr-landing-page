@@ -47,16 +47,24 @@ const Footer = () => {
           <p className="text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} AiThinkr. All rights reserved.
           </p>
-          <div className="flex space-x-4 mt-4 sm:mt-0">
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-              <Twitter className="h-5 w-5" />
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-              <Linkedin className="h-5 w-5" />
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-              <Github className="h-5 w-5" />
-            </a>
+          <div className="flex items-center gap-x-6 mt-4 sm:mt-0">
+            <Link to="/terms-of-service" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              Terms of Service
+            </Link>
+            <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              Privacy Policy
+            </Link>
+            <div className="flex space-x-4">
+                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Twitter className="h-5 w-5" />
+                </a>
+                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Linkedin className="h-5 w-5" />
+                </a>
+                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Github className="h-5 w-5" />
+                </a>
+            </div>
           </div>
         </div>
       </div>

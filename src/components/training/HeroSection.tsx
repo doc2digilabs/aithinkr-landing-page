@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Calendar, Download, Sparkles, Users } from "lucide-react"
 import heroImage from "@/assets/ai-hero-bg.jpg"
+import { Link } from "react-router-dom"
 
 const HeroSection = () => {
   return (
@@ -56,17 +57,18 @@ const HeroSection = () => {
           
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            
-            <div className="flex gap-4">
-            <Button variant="outline" size="lg">
-                <Download className="w-5 h-5 mr-2" />
+            <Link to="/register">
+              <Button variant="hero" size="xl" className="font-semibold shadow-lg hover:shadow-primary/40 transition-all duration-300 transform hover:-translate-y-1">
+                <Users className="w-5 h-5 mr-2" />
                 Apply Now
               </Button>
+            </Link>
+            <div className="flex gap-4">
               <Button variant="outline" size="lg">
                 <Download className="w-5 h-5 mr-2" />
                 Download Brochure
               </Button>
-              <Button variant="outline" size="lg">
+              <Button variant="ghost" size="lg">
                 <Calendar className="w-5 h-5 mr-2" />
                 Join Info Session
               </Button>
