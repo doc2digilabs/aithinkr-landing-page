@@ -1,73 +1,125 @@
-# Welcome to your Lovable project
+# Project Understanding Guide
 
-## Project info
+## 1. Overview
 
-**URL**: https://lovable.dev/projects/5f864fcc-32af-4b22-9ae9-12d58a9e9eca
+Welcome to the `aithinkr-WEB-Platform` project! This is a modern web application built with **React** and **TypeScript**, designed to serve as the main website for AIThinkr. The application is more than just a static landing page; it includes dynamic features such as user authentication, user profiles, and dedicated sections for various content like a blog, careers, and product information.
 
-## How can I edit this code?
+The project is bootstrapped with **Vite**, ensuring a fast and efficient development experience. It leverages **Supabase** for its backend services, including database and authentication, and uses **Tailwind CSS** for styling, complemented by a rich set of UI components.
 
-There are several ways of editing your application.
+## 2. Tech Stack
 
-**Use Lovable**
+- **Framework**: [React](https://reactjs.org/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **UI Components**: A custom component library in `src/components/ui`, likely based on [shadcn/ui](httpss://ui.shadcn.com/), which uses Radix UI primitives.
+- **Backend & Database**: [Supabase](https://supabase.io/)
+- **Package Manager**: [Bun](https://bun.sh/) (inferred from `bun.lockb`)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5f864fcc-32af-4b22-9ae9-12d58a9e9eca) and start prompting.
+## 3. Project Structure
 
-Changes made via Lovable will be committed automatically to this repo.
+The codebase is organized to separate concerns, making it easier to navigate and maintain.
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+/
+├── src/
+│   ├── assets/         # Static assets like images, logos, etc.
+│   ├── components/     # Reusable React components
+│   │   ├── ui/         # Core, generic UI components (Button, Card, etc.)
+│   │   ├── layout/     # Components that define the page structure (Header, Footer)
+│   │   ├── auth/       # Components related to user authentication (Login, Register)
+│   │   └── [feature]/  # Components specific to a feature (e.g., home, products)
+│   ├── lib/            # Shared libraries, utilities, and configurations
+│   │   └── supabaseClient.ts # Supabase client initialization and configuration
+│   ├── hooks/          # Custom React hooks
+│   ├── pages/          # Top-level page components, mapped to routes
+│   └── ...
+├── public/             # Static assets that are copied directly to the build output
+└── package.json        # Project dependencies and scripts
 ```
 
-**Edit a file directly in GitHub**
+### Key Directories
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+-   **`src/components`**: This is where most of a developer's work will be.
+    -   **`ui/`**: Contains generic, reusable UI components that form the design system. Before creating a new UI element, check here first.
+    -   **Feature-based directories (e.g., `home/`, `products/`, `auth/`)**: These contain components that are specific to a particular feature or page. This helps in organizing the code logically.
+-   **`src/pages`**: Each file in this directory (or its subdirectories) represents a route in the application. These components are responsible for fetching data and composing the page using components from `src/components`.
+-   **`src/lib`**: Contains core logic and configurations.
+    -   `supabaseClient.ts`: This is a critical file that configures the connection to the Supabase backend. All interactions with Supabase should go through this client.
+    -   `utils.ts`: A home for miscellaneous utility functions that can be used across the application.
+-   **`src/db`**:
+    -   `schema.txt`: This file likely contains the database schema definition. Refer to this file to understand the data models and relationships.
 
-**Use GitHub Codespaces**
+## 4. Getting Started
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Prerequisites
 
-## What technologies are used for this project?
+-   [Node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/)
+-   [Bun](https://bun.sh/) (as inferred from `bun.lockb`)
+-   A [Supabase](https://supabase.com/) account and project.
 
-This project is built with:
+### Installation & Setup
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository-url>
+    cd aithinkr-landing-page
+    ```
 
-## How can I deploy this project?
+2.  **Install dependencies:**
+    This project uses Bun as the package manager.
+    ```bash
+    bun install
+    ```
 
-Simply open [Lovable](https://lovable.dev/projects/5f864fcc-32af-4b22-9ae9-12d58a9e9eca) and click on Share -> Publish.
+3.  **Set up environment variables:**
+    The application requires a connection to a Supabase backend. You will need to create a `.env.local` file in the root of the project and add your Supabase project URL and anon key.
+    ```bash
+    cp .env .env.local
+    ```
+    Now, edit `.env.local` with your credentials.
+    ```env
+    VITE_SUPABASE_URL=your-supabase-project-url
+    VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+    ```
 
-## Can I connect a custom domain to my Lovable project?
+4.  **Set up the database:**
+    The database schema is likely defined in `src/db/schema.txt`. You will need to apply this schema to your Supabase project. You can do this by running the SQL statements in the Supabase SQL editor.
 
-Yes, you can!
+### Running the Application
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+-   **Development:** To start the development server with hot-reloading.
+    ```bash
+    bun run dev
+    ```
+    The application will be available at `http://localhost:8080` (or another port if 8081 is busy).
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+-   **Build:** To create a production-ready build of the application.
+    ```bash
+    bun run build
+    ```
+    The output will be in the `dist/` directory.
+
+-   **Lint:** To run the linter and check for code quality issues.
+    ```bash
+    bun run lint
+    ```
+
+## 5. How to Contribute
+
+1.  **Create a new branch:**
+    ```bash
+    git checkout -b feature/your-feature-name
+    ```
+2.  **Make your changes:**
+    -   Follow the existing coding style and conventions.
+    -   Add new components to the appropriate directory in `src/components`.
+    -   If you add a new page, create a new file in `src/pages`.
+3.  **Test your changes:**
+    -   Run the linter to ensure your code is clean: `bun run lint`.
+    -   Manually test your changes in the browser to ensure they work as expected.
+4.  **Commit your changes:**
+    -   Write a clear and concise commit message.
+5.  **Push your changes and open a pull request.**
+
+This guide should provide a solid starting point for any new developer joining the project. If you have any questions, please don't hesitate to ask
