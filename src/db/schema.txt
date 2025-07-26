@@ -14,3 +14,5 @@
   student_subject text,
   professional_exp text,
   profescompany_name text,
+  wizard_completed boolean NOT NULL DEFAULT false,
+  role text

@@ -10,7 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabaseClient";
 
-interface Registration {
+interface Profile {
   email: string;
   name: string | null;
   course_name: string | null;
@@ -19,22 +19,22 @@ interface Registration {
 }
 
 export function AdminDashboard() {
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRegistrations = async () => {
+    const fetchProfiles = async () => {
       const { data, error } = await supabase
-        .from("registrations")
+        .from("profiles")
         .select("email, name, course_name, created_at, role")
         .order("created_at", { ascending: false });
 
       if (data) {
-        setRegistrations(data);
+        setProfiles(data);
       }
       setLoading(false);
     };
-    fetchRegistrations();
+    fetchProfiles();
   }, []);
 
   if (loading) {
@@ -58,15 +58,15 @@ export function AdminDashboard() {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {registrations.map((reg) => (
-                <TableRow key={reg.email}>
-                    <TableCell>{reg.email}</TableCell>
-                    <TableCell>{reg.name || "N/A"}</TableCell>
-                    <TableCell>{reg.course_name || "N/A"}</TableCell>
-                    <TableCell>{new Date(reg.created_at).toLocaleDateString()}</TableCell>
+                {profiles.map((profile) => (
+                <TableRow key={profile.email}>
+                    <TableCell>{profile.email}</TableCell>
+                    <TableCell>{profile.name || "N/A"}</TableCell>
+                    <TableCell>{profile.course_name || "N/A"}</TableCell>
+                    <TableCell>{new Date(profile.created_at).toLocaleDateString()}</TableCell>
                     <TableCell>
-                        <Badge variant={reg.role === 'admin' ? 'default' : 'secondary'}>
-                            {reg.role}
+                        <Badge variant={profile.role === 'admin' ? 'default' : 'secondary'}>
+                            {profile.role}
                         </Badge>
                     </TableCell>
                 </TableRow>

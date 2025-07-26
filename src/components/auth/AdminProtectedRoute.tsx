@@ -15,9 +15,9 @@ const useAdminRole = (session: Session | null) => {
 
         const checkAdminRole = async () => {
             const { data, error } = await supabase
-                .from('registrations')
+                .from('profiles')
                 .select('role')
-                .eq('email', session.user.email)
+                .eq('id', session.user.id)
                 .single();
 
             if (data && data.role === 'admin') {

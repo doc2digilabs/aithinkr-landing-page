@@ -77,8 +77,8 @@ export function NavigationBar() {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <Link to="/about" className={navigationMenuTriggerStyle()}>
-                  About
+                <Link to="/training" className={navigationMenuTriggerStyle()}>
+                  Training
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
@@ -91,11 +91,7 @@ export function NavigationBar() {
                   Research
                 </Link>
               </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link to="/training" className={navigationMenuTriggerStyle()}>
-                  Training
-                </Link>
-              </NavigationMenuItem>
+              
               <NavigationMenuItem>
                 <Link to="/blog" className={navigationMenuTriggerStyle()}>
                   Blog

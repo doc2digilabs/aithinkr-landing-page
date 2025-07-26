@@ -29,24 +29,35 @@ export const CreateAccountForm = () => {
     });
 
     if (error) {
-        if (error.message.includes("User already registered")) {
-            toast.info("You've Already Registered", {
-                description: "This email address is already in use. Please sign in instead.",
-                icon: <UserCheck className="h-5 w-5" />,
-            });
-        } else {
-            toast.error("Registration Failed", {
-                description: error.message,
-                icon: <AlertCircle className="h-5 w-5" />,
-            });
-        }
+      if (error.message.includes("User already registered")) {
+        toast.info("You've Already Registered", {
+          description: "This email address is already in use. Please sign in instead.",
+          icon: <UserCheck className="h-5 w-5" />,
+        });
+      } else {
+        toast.error("Registration Failed", {
+          description: error.message,
+          icon: <AlertCircle className="h-5 w-5" />,
+        });
+      }
     } else if (data.user) {
-      toast.success("Account Created!", {
-        description: "Please check your email to verify your account before logging in.",
-        icon: <Mail className="h-5 w-5" />,
-      });
-      setEmail("");
-      setPassword("");
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert([{ id: data.user.id, email: data.user.email, wizard_completed: false }]);
+
+      if (profileError) {
+        toast.error("Failed to create profile", {
+          description: profileError.message,
+          icon: <AlertCircle className="h-5 w-5" />,
+        });
+      } else {
+        toast.success("Account Created!", {
+          description: "Please check your email to verify your account before logging in.",
+          icon: <Mail className="h-5 w-5" />,
+        });
+        setEmail("");
+        setPassword("");
+      }
     }
 
     setLoading(false);
@@ -66,28 +77,28 @@ export const CreateAccountForm = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
+              <Label htmlFor="email">Email Address</Label>
+              <Input
                 id="email"
                 type="email"
                 placeholder="john.doe@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                />
+              />
             </div>
             <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
+              <Label htmlFor="password">Password</Label>
+              <Input
                 id="password"
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                />
+              />
             </div>
-             <CardFooter className="px-0 pt-8">
+            <CardFooter className="px-0 pt-8">
               <Button type="submit" disabled={loading} className="w-full text-lg">
                 {loading ? "Creating Account..." : "Create Account"}
               </Button>
