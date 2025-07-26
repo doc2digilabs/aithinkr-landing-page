@@ -12,8 +12,12 @@ export const Auth = () => {
   const handleGoogleSignIn = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
     });
     if (error) {
+      console.error
       toast.error(error.message);
     }
   };
@@ -21,6 +25,9 @@ export const Auth = () => {
   const handleGithubSignIn = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "github",
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
     });
     if (error) {
       toast.error(error.message);

@@ -62,7 +62,7 @@ export const RegistrationDetailsForm = () => {
     }
 
     const { error } = await supabase
-      .from("registrations")
+      .from("profiles")
       .update({
         name: formData.name,
         phone_no: formData.phone_no,
@@ -71,7 +71,7 @@ export const RegistrationDetailsForm = () => {
         is_python: formData.is_python,
         is_machine_learning: formData.is_machine_learning,
       })
-      .eq("email", user.email);
+      .eq("id", user.id);
 
     if (error) {
       toast.error("Error Saving Details", {

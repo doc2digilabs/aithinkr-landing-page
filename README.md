@@ -12,7 +12,7 @@ The project is bootstrapped with **Vite**, ensuring a fast and efficient develop
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Build Tool**: [Vite](https://vitejs.dev/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **UI Components**: A custom component library in `src/components/ui`, likely based on [shadcn/ui](httpss://ui.shadcn.com/), which uses Radix UI primitives.
+- **UI Components**: A custom component library in `src/components/ui`, likely based on [shadcn/ui](httpshttpss://ui.shadcn.com/), which uses Radix UI primitives.
 - **Backend & Database**: [Supabase](https://supabase.io/)
 - **Package Manager**: [Bun](https://bun.sh/) (inferred from `bun.lockb`)
 
@@ -22,6 +22,9 @@ The codebase is organized to separate concerns, making it easier to navigate and
 
 ```
 /
+├── supabase/
+│   └── migrations/
+│       └── 001_initial_schema.sql  # Initial database schema
 ├── src/
 │   ├── assets/         # Static assets like images, logos, etc.
 │   ├── components/     # Reusable React components
@@ -47,8 +50,7 @@ The codebase is organized to separate concerns, making it easier to navigate and
 -   **`src/lib`**: Contains core logic and configurations.
     -   `supabaseClient.ts`: This is a critical file that configures the connection to the Supabase backend. All interactions with Supabase should go through this client.
     -   `utils.ts`: A home for miscellaneous utility functions that can be used across the application.
--   **`src/db`**:
-    -   `schema.txt`: This file likely contains the database schema definition. Refer to this file to understand the data models and relationships.
+-   **`supabase/migrations`**: This directory contains the database migration scripts. These scripts are used to manage the database schema.
 
 ## 4. Getting Started
 
@@ -83,8 +85,31 @@ The codebase is organized to separate concerns, making it easier to navigate and
     VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
     ```
 
-4.  **Set up the database:**
-    The database schema is likely defined in `src/db/schema.txt`. You will need to apply this schema to your Supabase project. You can do this by running the SQL statements in the Supabase SQL editor.
+### Database Setup
+
+To set up the database, you need to apply the initial schema using the Supabase CLI.
+
+1.  **Install the Supabase CLI:**
+    ```bash
+    npm install -g supabase
+    ```
+
+2.  **Login to Supabase:**
+    ```bash
+    supabase login
+    ```
+
+3.  **Link your project:**
+    ```bash
+    supabase link --project-ref <your-project-ref>
+    ```
+
+4.  **Apply the database migrations:**
+    ```bash
+    supabase db push
+    ```
+
+This will execute the SQL script in `supabase/migrations` and set up your database.
 
 ### Running the Application
 

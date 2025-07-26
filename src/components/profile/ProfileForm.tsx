@@ -47,9 +47,9 @@ const ProfileForm = () => {
       const fetchProfile = async () => {
         setLoading(true);
         const { data, error } = await supabase
-          .from("registrations")
+          .from("profiles")
           .select("name, phone_no")
-          .eq("email", session.user.email)
+          .eq("id", session.user.id)
           .limit(1)
           .single();
 
@@ -89,7 +89,7 @@ const ProfileForm = () => {
     });
 
     const { error: dbError } = await supabase
-      .from("registrations")
+      .from("profiles")
       .update({ name, phone_no: phone_no || null })
       .eq("email", session.user.email);
 

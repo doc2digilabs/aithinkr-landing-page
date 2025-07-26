@@ -22,9 +22,9 @@ export function Dashboard() {
       if (user) {
         setUser(user);
         const { data: registrationData } = await supabase
-          .from("registrations")
+          .from("profiles")
           .select("course_name, name, phone_no")
-          .eq("email", user.email)
+          .eq("id", user.id)
           .single();
 
         if (registrationData) {

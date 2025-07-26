@@ -26,6 +26,7 @@ import {
 import { Brain, Menu, LogOut, User, LayoutDashboard } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { Session } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
 export function NavigationBar() {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -37,9 +38,7 @@ export function NavigationBar() {
       setSession(session);
     });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (_event === 'SIGNED_IN' && session) {
         // Check if the user's name is in their metadata, which indicates a complete profile.
@@ -47,6 +46,13 @@ export function NavigationBar() {
           navigate('/dashboard');
         } else {
           navigate('/complete-profile');
+        }
+      } else if (_event === 'SIGNED_IN' && !session) {
+        // This case can happen if there is an error during the OAuth flow.
+        const url = new URL(window.location.href);
+        const error = url.searchParams.get('error_description');
+        if (error) {
+          toast.error(error);
         }
       }
       if (_event === 'SIGNED_OUT') {
