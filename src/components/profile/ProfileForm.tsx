@@ -21,6 +21,7 @@ const ProfileForm = () => {
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
+    email: "", // Added email to form data
     phone_no: "",
   });
   const [password, setPassword] = useState("");
@@ -44,6 +45,13 @@ const ProfileForm = () => {
 
   useEffect(() => {
     if (session?.user) {
+      // Initialize formData with email and name from session metadata
+      setFormData((prev) => ({
+        ...prev,
+        email: session.user.email || "",
+        name: (session.user.user_metadata?.name as string) || prev.name,
+      }));
+
       const fetchProfile = async () => {
         setLoading(true);
         const { data, error } = await supabase
@@ -60,7 +68,7 @@ const ProfileForm = () => {
           });
         } else if (data) {
           const profileData = { name: data.name || "", phone_no: data.phone_no || "" };
-          setFormData(profileData);
+          setFormData((prev) => ({ ...prev, ...profileData })); // Merge with existing formData
           calculateCompleteness(profileData);
         } else {
           // Handle case where there's no registration record yet
@@ -164,6 +172,16 @@ const ProfileForm = () => {
           </div>
           <Separator className="mb-6" />
           <form onSubmit={handleUpdateProfile} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                readOnly
+                disabled
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
               <Input

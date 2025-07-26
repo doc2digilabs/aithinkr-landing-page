@@ -6,7 +6,7 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
        id uuid NOT NULL PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
        email VARCHAR,
        name VARCHAR,
-       phone_no NUMERIC,
+       phone_no NUMERIC UNIQUE,
        role TEXT,
        student_stream TEXT,
        student_subject TEXT,
