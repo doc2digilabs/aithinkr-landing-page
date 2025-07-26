@@ -21,6 +21,8 @@ import TermsOfServicePage from "./pages/terms-of-service";
 import DashboardPage from "./pages/dashboard";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import CompleteProfilePage from "./pages/complete-profile";
+import { AdminDashboard } from "./components/admin/AdminDashboard";
+import { AdminProtectedRoute } from "./components/auth/AdminProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -41,12 +43,17 @@ const AppContent = () => {
       <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
       <Route path="/terms-of-service" element={<TermsOfServicePage />} />
 
+      {/* Admin Protected Routes */}
+      <Route element={<AdminProtectedRoute />}>
+        <Route path="/admin" element={<AdminDashboard />} />
+      </Route>
+
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/complete-profile" element={<CompleteProfilePage />} />
-      </Route>
+      </Route>     
 
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
