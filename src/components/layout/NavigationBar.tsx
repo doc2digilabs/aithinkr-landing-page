@@ -131,7 +131,7 @@ export function NavigationBar() {
                 <Brain className="h-6 w-6 text-primary" />
                 <span>AiThinkr</span>
               </Link>
-              <Link to="/about" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">About</Link>
+              <Link to="/training" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Training</Link>
               <Link to="/products" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Products</Link>
               <Link to="/research" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Research</Link>
               <Link to="/blog" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Blog</Link>
