@@ -23,6 +23,9 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import CompleteProfilePage from "./pages/complete-profile";
 import { AdminDashboard } from "./components/admin/AdminDashboard";
 import { AdminProtectedRoute } from "./components/auth/AdminProtectedRoute";
+import CoursesPage from "./pages/courses";
+import CourseDetailPage from "./pages/course-detail";
+import CoursePlayer from "./pages/course-player/CoursePlayer";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +45,8 @@ const AppContent = () => {
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
       <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+      <Route path="/courses" element={<CoursesPage />} />
+      <Route path="/courses/:courseId" element={<CourseDetailPage />} />
 
       {/* Admin Protected Routes */}
       <Route element={<AdminProtectedRoute />}>
@@ -53,6 +58,7 @@ const AppContent = () => {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/complete-profile" element={<CompleteProfilePage />} />
+        <Route path="/courses/:courseId/learn" element={<CoursePlayer />} />
       </Route>     
 
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

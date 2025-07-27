@@ -23,7 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Brain, Menu, LogOut, User, LayoutDashboard } from "lucide-react";
+import { Brain, Menu, LogOut, User, LayoutDashboard, Shield } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { Session } from "@supabase/supabase-js";
 import { toast } from "sonner";
@@ -31,24 +31,47 @@ import { toast } from "sonner";
 export function NavigationBar() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [session, setSession] = React.useState<Session | null>(null);
+  const [isAdmin, setIsAdmin] = React.useState(false);
   const navigate = useNavigate();
+
+  const checkUserRole = async (user: User | null) => {
+    if (!user) {
+      setIsAdmin(false);
+      return;
+    }
+    const { data } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    setIsAdmin(data?.role === 'admin');
+  };
 
   React.useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      checkUserRole(session?.user || null);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
+      await checkUserRole(session?.user || null);
+
       if (_event === 'SIGNED_IN' && session) {
-        // Check if the user's name is in their metadata, which indicates a complete profile.
-        if (session.user.user_metadata?.name) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('role, name')
+          .eq('id', session.user.id)
+          .single();
+
+        if (data?.role === 'admin') {
+          navigate('/admin');
+        } else if (data?.name) {
           navigate('/dashboard');
         } else {
           navigate('/complete-profile');
         }
       } else if (_event === 'SIGNED_IN' && !session) {
-        // This case can happen if there is an error during the OAuth flow.
         const url = new URL(window.location.href);
         const error = url.searchParams.get('error_description');
         if (error) {
@@ -64,7 +87,14 @@ export function NavigationBar() {
   }, [navigate]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error("Logout failed: " + error.message);
+    } else {
+      setIsAdmin(false);
+      navigate('/auth');
+      toast.success("You have been signed out.");
+    }
   };
 
   const getInitials = (email: string | undefined) => {
@@ -108,6 +138,11 @@ export function NavigationBar() {
                   Careers
                 </Link>
               </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link to="/courses" className={navigationMenuTriggerStyle()}>
+                  Courses
+                </Link>
+              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
         </div>
@@ -142,6 +177,7 @@ export function NavigationBar() {
               <Link to="/research" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Research</Link>
               <Link to="/blog" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Blog</Link>
               <Link to="/careers" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Careers</Link>
+              <Link to="/courses" onClick={() => setIsOpen(false)} className="hover:text-primary transition-colors">Courses</Link>
             </nav>
           </SheetContent>
         </Sheet>
@@ -167,6 +203,12 @@ export function NavigationBar() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                {isAdmin && (
+                  <DropdownMenuItem onClick={() => navigate('/admin')}>
+                    <Shield className="mr-2 h-4 w-4" />
+                    <span>Admin Dashboard</span>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   <span>Dashboard</span>

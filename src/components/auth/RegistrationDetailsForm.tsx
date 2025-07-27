@@ -1,16 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Card,
   CardContent,
@@ -24,30 +17,21 @@ import { supabase } from "@/lib/supabaseClient";
 import { User, AlertCircle } from "lucide-react";
 
 export const RegistrationDetailsForm = () => {
+  const [userType, setUserType] = useState<"student" | "professional" | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     phone_no: "",
-    course_name: "",
-    is_student: false,
-    is_python: false,
-    is_machine_learning: false,
+    student_stream: "",
+    student_subject: "",
+    professional_exp: "",
+    company_name: "",
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [id]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const handleSelectChange = (value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      course_name: value,
-    }));
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,36 +40,34 @@ export const RegistrationDetailsForm = () => {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-        toast.error("You must be logged in to complete your profile.", { icon: <AlertCircle/> });
-        setLoading(false);
-        return;
+      toast.error("You must be logged in to complete your profile.", { icon: <AlertCircle /> });
+      setLoading(false);
+      return;
     }
 
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        name: formData.name,
-        phone_no: formData.phone_no,
-        course_name: formData.course_name,
-        is_student: formData.is_student,
-        is_python: formData.is_python,
-        is_machine_learning: formData.is_machine_learning,
-      })
-      .eq("id", user.id);
+    // Sanitize phone number to only include digits
+    const sanitizedPhone = formData.phone_no.replace(/\D/g, '');
+
+    const profileData = {
+      name: formData.name,
+      phone_no: sanitizedPhone || null, // Send null if empty
+      student_stream: userType === 'student' ? formData.student_stream : null,
+      student_subject: userType === 'student' ? formData.student_subject : null,
+      professional_exp: userType === 'professional' ? formData.professional_exp : null,
+      company_name: userType === 'professional' ? formData.company_name : null,
+      wizard_completed: true,
+    };
+
+    console.log("Attempting to save profile data:", profileData);
+
+    const { error } = await supabase.from("profiles").update(profileData).eq("id", user.id);
 
     if (error) {
-      toast.error("Error Saving Details", {
-        description: error.message,
-        icon: <AlertCircle className="h-5 w-5" />,
-      });
+      console.error("Error updating profile:", error);
+      toast.error("Error Saving Details", { description: error.message, icon: <AlertCircle /> });
     } else {
-      // Also update the user's metadata
       await supabase.auth.updateUser({ data: { name: formData.name } });
-      
-      toast.success("Profile Complete!", {
-        description: "Thank you for completing your registration. Redirecting to your dashboard...",
-        icon: <User className="h-5 w-5" />,
-      });
+      toast.success("Profile Complete!", { description: "Redirecting to your dashboard...", icon: <User /> });
       navigate("/dashboard");
     }
 
@@ -96,86 +78,77 @@ export const RegistrationDetailsForm = () => {
     <div className="flex justify-center items-center py-12 px-4">
       <Card className="w-full max-w-2xl">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold text-center">
-            Complete Your Profile
-          </CardTitle>
+          <CardTitle className="text-3xl font-bold text-center">Complete Your Profile</CardTitle>
           <CardDescription className="text-center text-lg">
-            Tell us a bit more about yourself to get started.
+            Let's start with who you are.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="John Doe"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone_no">Phone Number</Label>
-                <Input
-                  id="phone_no"
-                  type="tel"
-                  placeholder="+1 234 567 890"
-                  value={formData.phone_no}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="course_name">Course of Interest</Label>
-                <Select onValueChange={handleSelectChange} value={formData.course_name}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a course" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Full Stack Development">
-                      Full Stack Development
-                    </SelectItem>
-                    <SelectItem value="Data Science">Data Science</SelectItem>
-                    <SelectItem value="AI/ML Engineering">
-                      AI/ML Engineering
-                    </SelectItem>
-                     <SelectItem value="Cloud Computing">
-                      Cloud Computing
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="space-y-3 text-center">
+              <Label className="text-xl">Are you a student or a professional?</Label>
+              <RadioGroup onValueChange={(value) => setUserType(value as "student" | "professional")} className="flex justify-center space-x-6 pt-2">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="student" id="r1" />
+                  <Label htmlFor="r1" className="text-lg">Student</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="professional" id="r2" />
+                  <Label htmlFor="r2" className="text-lg">Professional</Label>
+                </div>
+              </RadioGroup>
             </div>
-            <div className="space-y-4 pt-4">
-                <div className="flex items-center space-x-3">
-                  <Checkbox id="is_student" checked={formData.is_student} onCheckedChange={(checked) => setFormData(prev => ({...prev, is_student: !!checked}))} />
-                  <Label htmlFor="is_student" className="text-base">
-                    Are you currently a student?
-                  </Label>
+
+            {userType && (
+              <div className="space-y-6 animate-in fade-in duration-500">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input id="name" placeholder="John Doe" value={formData.name} onChange={handleChange} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone_no">Phone Number</Label>
+                    <Input id="phone_no" type="tel" placeholder="+1 234 567 890" value={formData.phone_no} onChange={handleChange} />
+                  </div>
                 </div>
-                 <div className="flex items-center space-x-3">
-                  <Checkbox id="is_python" checked={formData.is_python} onCheckedChange={(checked) => setFormData(prev => ({...prev, is_python: !!checked}))} />
-                  <Label htmlFor="is_python" className="text-base">
-                    Do you have experience with Python?
-                  </Label>
-                </div>
-                 <div className="flex items-center space-x-3">
-                  <Checkbox id="is_machine_learning" checked={formData.is_machine_learning} onCheckedChange={(checked) => setFormData(prev => ({...prev, is_machine_learning: !!checked}))} />
-                  <Label htmlFor="is_machine_learning" className="text-base">
-                    Are you interested in Machine Learning?
-                  </Label>
-                </div>
-            </div>
-             <CardFooter className="px-0 pt-8">
-              <Button type="submit" disabled={loading} className="w-full text-lg">
-                {loading ? "Saving..." : "Save and Continue"}
-              </Button>
-            </CardFooter>
+
+                {userType === 'student' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="student_stream">Stream/Field of Study</Label>
+                      <Input id="student_stream" placeholder="e.g., Computer Science" value={formData.student_stream} onChange={handleChange} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="student_subject">Key Subjects</Label>
+                      <Input id="student_subject" placeholder="e.g., AI, Web Dev" value={formData.student_subject} onChange={handleChange} />
+                    </div>
+                  </div>
+                )}
+
+                {userType === 'professional' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="professional_exp">Years of Experience</Label>
+                      <Input id="professional_exp" type="number" placeholder="e.g., 5" value={formData.professional_exp} onChange={handleChange} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="company_name">Company Name</Label>
+                      <Input id="company_name" placeholder="e.g., Google" value={formData.company_name} onChange={handleChange} />
+                    </div>
+                  </div>
+                )}
+                
+                <CardFooter className="px-0 pt-4">
+                  <Button type="submit" disabled={loading} className="w-full text-lg">
+                    {loading ? "Saving..." : "Save and Continue"}
+                  </Button>
+                </CardFooter>
+              </div>
+            )}
           </form>
         </CardContent>
       </Card>
     </div>
   );
 };
+

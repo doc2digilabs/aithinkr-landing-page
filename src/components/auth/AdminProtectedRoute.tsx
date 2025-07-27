@@ -3,65 +3,88 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { supabase } from '@/lib/supabaseClient';
 import { Session } from '@supabase/supabase-js';
 
-const useAdminRole = (session: Session | null) => {
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [loading, setLoading] = useState(true);
+// 1. Consolidated `useAuth` hook
+const useAuth = () => {
+  const [session, setSession] = useState<Session | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (!session?.user) {
-            setLoading(false);
-            return;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+        setSession(session);
+
+        // If session exists, fetch profile and check role
+        if (session?.user) {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+
+          if (error) {
+            // It's possible the profile doesn't exist yet or RLS is blocking.
+            // Log the error but don't throw, as we want to handle this gracefully.
+            console.error('Error fetching user profile:', error.message);
+            setIsAdmin(false);
+          } else {
+            setIsAdmin(data?.role === 'admin');
+          }
+        } else {
+          setIsAdmin(false);
         }
+      } catch (e) {
+        console.error('An error occurred in useAuth:', e);
+        setIsAdmin(false);
+        setSession(null);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        const checkAdminRole = async () => {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('role')
-                .eq('id', session.user.id)
-                .single();
+    fetchData();
 
-            if (data && data.role === 'admin') {
-                setIsAdmin(true);
-            }
-            setLoading(false);
-        };
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, newSession) => {
+        setSession(newSession);
+        // Re-check role when auth state changes
+        fetchData();
+      }
+    );
 
-        checkAdminRole();
-    }, [session]);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
-    return { isAdmin, loading };
+  return { session, isAdmin, loading };
 };
 
 
+// 2. Simplified AdminProtectedRoute component
 export const AdminProtectedRoute = () => {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loadingSession, setLoadingSession] = useState(true);
+  const { session, isAdmin, loading } = useAuth();
 
-  useEffect(() => {
-    const fetchSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setLoadingSession(false);
-    };
+  console.log('Auth state:', { loading, isAdmin, session: !!session });
 
-    fetchSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const { isAdmin, loading: loadingRole } = useAdminRole(session);
-
-  if (loadingSession || loadingRole) {
+  if (loading) {
     return <div>Loading...</div>; // Or a spinner component
   }
 
   if (!session) {
+    console.log('Redirecting: No session. Target: /auth');
     return <Navigate to="/auth" />;
   }
 
-  return isAdmin ? <Outlet /> : <Navigate to="/dashboard" />;
+  if (!isAdmin) {
+    console.log('Redirecting: User is not an admin. Target: /dashboard');
+    return <Navigate to="/dashboard" />;
+  }
+
+  console.log('Access granted: User is an admin.');
+  return <Outlet />;
 };

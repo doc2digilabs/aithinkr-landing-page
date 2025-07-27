@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabaseClient";
@@ -19,66 +18,57 @@ import { Save, ShieldCheck, AlertCircle, XCircle } from "lucide-react";
 const ProfileForm = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userType, setUserType] = useState<'student' | 'professional' | null>(null);
   const [formData, setFormData] = useState({
+    email: "",
     name: "",
-    email: "", // Added email to form data
     phone_no: "",
+    student_stream: "",
+    student_subject: "",
+    professional_exp: "",
+    company_name: "",
   });
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [completeness, setCompleteness] = useState(0);
-
-  const calculateCompleteness = (data: { name: string | null, phone_no: string | null }) => {
-    let calculatedCompleteness = 50; // Base for having an account
-    if (data.name) calculatedCompleteness += 25;
-    if (data.phone_no) calculatedCompleteness += 25;
-    setCompleteness(calculatedCompleteness);
-  };
 
   useEffect(() => {
-    const getSession = async () => {
+    const getSessionAndProfile = async () => {
+      setLoading(true);
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
-    };
-    getSession();
-  }, []);
 
-  useEffect(() => {
-    if (session?.user) {
-      // Initialize formData with email and name from session metadata
-      setFormData((prev) => ({
-        ...prev,
-        email: session.user.email || "",
-        name: (session.user.user_metadata?.name as string) || prev.name,
-      }));
-
-      const fetchProfile = async () => {
-        setLoading(true);
-        const { data, error } = await supabase
+      if (session?.user) {
+        const { data: profile, error } = await supabase
           .from("profiles")
-          .select("name, phone_no")
+          .select("*")
           .eq("id", session.user.id)
-          .limit(1)
           .single();
 
-        if (error && error.code !== 'PGRST116') { // Ignore 'exact one row not found'
-          toast.error("Error Fetching Profile", {
-            description: error.message,
-            icon: <AlertCircle className="h-5 w-5" />,
+        if (error) {
+          toast.error("Error fetching profile", { description: error.message });
+        } else if (profile) {
+          setFormData({
+            email: session.user.email || "",
+            name: profile.name || "",
+            phone_no: profile.phone_no || "",
+            student_stream: profile.student_stream || "",
+            student_subject: profile.student_subject || "",
+            professional_exp: profile.professional_exp || "",
+            company_name: profile.company_name || "",
           });
-        } else if (data) {
-          const profileData = { name: data.name || "", phone_no: data.phone_no || "" };
-          setFormData((prev) => ({ ...prev, ...profileData })); // Merge with existing formData
-          calculateCompleteness(profileData);
-        } else {
-          // Handle case where there's no registration record yet
-          calculateCompleteness({ name: null, phone_no: null });
+
+          // Determine user type based on profile data
+          if (profile.student_stream || profile.student_subject) {
+            setUserType("student");
+          } else if (profile.professional_exp || profile.company_name) {
+            setUserType("professional");
+          }
         }
-        setLoading(false);
-      };
-      fetchProfile();
-    }
-  }, [session]);
+      }
+      setLoading(false);
+    };
+    getSessionAndProfile();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -88,30 +78,29 @@ const ProfileForm = () => {
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!session?.user) return;
-
     setLoading(true);
-    const { name, phone_no } = formData;
 
-    const { error: authError } = await supabase.auth.updateUser({
-      data: { name, phone_no },
-    });
+    const { name, phone_no, student_stream, student_subject, professional_exp, company_name } = formData;
+    
+    const profileData = {
+      name,
+      phone_no,
+      student_stream: userType === 'student' ? student_stream : null,
+      student_subject: userType === 'student' ? student_subject : null,
+      professional_exp: userType === 'professional' ? professional_exp : null,
+      company_name: userType === 'professional' ? company_name : null,
+    };
 
-    const { error: dbError } = await supabase
+    const { error } = await supabase
       .from("profiles")
-      .update({ name, phone_no: phone_no || null })
-      .eq("email", session.user.email);
+      .update(profileData)
+      .eq("id", session.user.id);
 
-    if (authError || dbError) {
-      toast.error("Error Updating Profile", {
-        description: authError?.message || dbError?.message,
-        icon: <AlertCircle className="h-5 w-5" />,
-      });
+    if (error) {
+      toast.error("Error Updating Profile", { description: error.message });
     } else {
-      toast.success("Profile Updated", {
-        description: "Your information has been successfully updated.",
-        icon: <Save className="h-5 w-5" />,
-      });
-      calculateCompleteness(formData); // Recalculate on successful update
+      await supabase.auth.updateUser({ data: { name } });
+      toast.success("Profile Updated Successfully");
     }
     setLoading(false);
   };
@@ -119,87 +108,81 @@ const ProfileForm = () => {
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      toast.error("Passwords Do Not Match", {
-        description: "Please re-enter your password and try again.",
-        icon: <XCircle className="h-5 w-5" />,
-      });
+      toast.error("Passwords do not match");
       return;
     }
     if (!password) {
-        toast.error("Password Cannot Be Empty", {
-            description: "Please enter a new password.",
-            icon: <XCircle className="h-5 w-5" />,
-        });
-        return;
+      toast.error("Password cannot be empty");
+      return;
     }
-
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     if (error) {
-      toast.error("Error Updating Password", {
-        description: error.message,
-        icon: <AlertCircle className="h-5 w-5" />,
-      });
+      toast.error("Error updating password", { description: error.message });
     } else {
-      toast.success("Password Updated", {
-        description: "Your password has been changed successfully.",
-        icon: <ShieldCheck className="h-5 w-5" />,
-      });
+      toast.success("Password updated successfully");
       setPassword("");
       setConfirmPassword("");
     }
     setLoading(false);
   };
 
-  if (loading && completeness === 0) {
+  if (loading) {
     return <p>Loading profile...</p>;
   }
 
   return (
-    <div className="grid gap-8 md:grid-cols-2">
-      <Card>
+    <div className="grid gap-8 md:grid-cols-3">
+      <Card className="md:col-span-2">
         <CardHeader>
           <CardTitle>Personal Information</CardTitle>
           <CardDescription>Update your personal details here.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2 mb-6">
-            <div className="flex justify-between items-center mb-1">
-              <Label>Profile Completeness</Label>
-              <span className="text-sm font-medium text-muted-foreground">{completeness}%</span>
+          <form onSubmit={handleUpdateProfile} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input id="email" type="email" value={formData.email} readOnly disabled />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input id="name" type="text" value={formData.name} onChange={handleChange} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone_no">Phone Number</Label>
+                <Input id="phone_no" type="tel" value={formData.phone_no} onChange={handleChange} />
+              </div>
             </div>
-            <Progress value={completeness} className="w-full" />
-          </div>
-          <Separator className="mb-6" />
-          <form onSubmit={handleUpdateProfile} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                readOnly
-                disabled
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                type="text"
-                value={formData.name}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone_no">Phone Number</Label>
-              <Input
-                id="phone_no"
-                type="tel"
-                value={formData.phone_no}
-                onChange={handleChange}
-              />
-            </div>
+            
+            <Separator />
+
+            {userType === 'student' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="student_stream">Stream/Field of Study</Label>
+                  <Input id="student_stream" value={formData.student_stream} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="student_subject">Key Subjects</Label>
+                  <Input id="student_subject" value={formData.student_subject} onChange={handleChange} />
+                </div>
+              </div>
+            )}
+
+            {userType === 'professional' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="professional_exp">Years of Experience</Label>
+                  <Input id="professional_exp" type="number" value={formData.professional_exp} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="company_name">Company Name</Label>
+                  <Input id="company_name" value={formData.company_name} onChange={handleChange} />
+                </div>
+              </div>
+            )}
+
             <Button type="submit" disabled={loading}>
               {loading ? "Saving..." : "Save Changes"}
             </Button>
@@ -210,29 +193,17 @@ const ProfileForm = () => {
       <Card>
         <CardHeader>
           <CardTitle>Change Password</CardTitle>
-          <CardDescription>
-            Choose a new password. Make it a strong one.
-          </CardDescription>
+          <CardDescription>Choose a new password.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleUpdatePassword} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="password">New Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm New Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
+              <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
             </div>
             <Button type="submit" variant="outline" disabled={loading}>
               {loading ? "Updating..." : "Update Password"}
