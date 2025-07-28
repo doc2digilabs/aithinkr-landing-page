@@ -4,47 +4,64 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription,
+  CardFooter
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
-import { User, BookOpen, CheckSquare } from "lucide-react";
+import { User, BookOpen, CheckSquare, PlusCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-// This should be in a separate types file
-interface EnrolledCourse {
-  id: string;
-  title: string;
-  description: string;
-  progress: number;
-}
+import { courses as staticCourses, Course } from "@/lib/courseData";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function Dashboard() {
   const [user, setUser] = useState<any>(null);
-  const [enrolledCourses, setEnrolledCourses] = useState<EnrolledCourse[]>([]);
+  const [enrolledCourses, setEnrolledCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
+      setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUser(user);
-        // In a real app, you would fetch enrolled courses from the DB
-        // For now, we'll use placeholder data
-        setEnrolledCourses([
-          { id: 'claude-with-the-anthropic-api', title: 'Claude with the Anthropic API', description: 'Learn to use the powerful Claude large language model via the Anthropic API.', progress: 25 },
-          { id: 'introduction-to-prompt-engineering', title: 'Introduction to Prompt Engineering', description: 'Master the art of crafting effective prompts for large language models.', progress: 0 },
-        ]);
+        
+        // Fetch enrolled course IDs from the database
+        const { data: enrolled, error } = await supabase
+          .from('user_courses')
+          .select('course_id')
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error("Error fetching enrolled courses:", error);
+        } else if (enrolled) {
+          // Map IDs to the full course objects from static data
+          const enrolledCourseIds = enrolled.map(e => e.course_id);
+          const userCourses = staticCourses.filter(course => enrolledCourseIds.includes(course.id));
+          setEnrolledCourses(userCourses);
+        }
       }
       setLoading(false);
     };
     fetchUserData();
   }, []);
 
-  if (loading) {
-    return <p>Loading dashboard...</p>;
-  }
+  const renderLoadingState = () => (
+    <div className="grid gap-6 md:grid-cols-2">
+      {Array.from({ length: 2 }).map((_, i) => (
+        <Card key={i}>
+          <CardHeader>
+            <Skeleton className="h-6 w-3/4" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-4 w-full mb-4" />
+            <Skeleton className="h-10 w-full" />
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
 
   return (
     <div className="space-y-8">
@@ -55,59 +72,46 @@ export function Dashboard() {
       
       <div>
         <h2 className="text-2xl font-bold mb-4">My Courses</h2>
-        <div className="grid gap-6 md:grid-cols-2">
-          {enrolledCourses.map(course => (
-            <Card key={course.id}>
-              <CardHeader>
-                <CardTitle>{course.title}</CardTitle>
-              </CardHeader>
+        {loading ? renderLoadingState() : (
+          enrolledCourses.length > 0 ? (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {enrolledCourses.map(course => (
+                <Card key={course.id} className="flex flex-col">
+                  <CardHeader>
+                    <CardTitle>{course.title}</CardTitle>
+                    <CardDescription className="line-clamp-2">{course.shortDescription}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-grow">
+                    <img src={course.image} alt={course.title} className="rounded-md object-cover h-40 w-full"/>
+                  </CardContent>
+                  <CardFooter>
+                    <Button 
+                      className="w-full"
+                      onClick={() => navigate(`/courses/${course.id}/learn`)}
+                    >
+                      <BookOpen className="mr-2 h-4 w-4" />
+                      Start Learning
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Card className="text-center py-12">
               <CardContent>
-                <p className="text-muted-foreground mb-4">{course.description}</p>
-                <div className="flex items-center justify-between">
-                  <Progress value={course.progress} className="w-3/4" />
-                  <span className="text-sm font-medium">{course.progress}%</span>
-                </div>
-                <Button 
-                  className="mt-4 w-full"
-                  onClick={() => navigate(`/courses/${course.id}/learn`)}
-                >
-                  {course.progress > 0 ? 'Continue Learning' : 'Start Course'}
+                <BookOpen className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-semibold">No Courses Yet</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  You haven't enrolled in any courses. Let's change that!
+                </p>
+                <Button className="mt-4" onClick={() => navigate('/courses')}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Explore Courses
                 </Button>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Courses Completed
-            </CardTitle>
-            <CheckSquare className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">
-              Keep up the great work!
-            </p>
-          </CardContent>
-        </Card>
-         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Your Account</CardTitle>
-            <User className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold capitalize">
-              {user?.aud || "Standard"}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Account status
-            </p>
-          </CardContent>
-        </Card>
+          )
+        )}
       </div>
     </div>
   );

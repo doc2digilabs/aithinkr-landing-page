@@ -1,7 +1,7 @@
 export interface Course {
     id: string;
     title: string;
-    description: string;
+    shortDescription: string;
     longDescription: string;
     duration: string;
     level: 'Beginner' | 'Intermediate' | 'Advanced';
@@ -12,13 +12,15 @@ export interface Course {
       topics: string[];
     }[];
     image: string;
+    price: number;
+    isFree?: boolean;
   }
   
   export const courses: Course[] = [
     {
       id: 'claude-with-the-anthropic-api',
       title: 'Claude with the Anthropic API',
-      description: 'Learn to use the powerful Claude large language model via the Anthropic API.',
+      shortDescription: 'Learn to use the powerful Claude large language model via the Anthropic API.',
       longDescription: 'This course provides a comprehensive introduction to the Anthropic API, empowering you to build applications on top of Claude, one of the most advanced large language models available. You will learn the fundamentals of interacting with the API, exploring its various features to generate creative text, solve complex problems, and build intelligent applications.',
       duration: '3 hours',
       level: 'Beginner',
@@ -46,11 +48,12 @@ export interface Course {
         },
       ],
       image: '/src/assets/hero-aithinkr.jpg',
+      price: 4999, // Price in INR (e.g., ₹4999)
     },
     {
       id: 'introduction-to-prompt-engineering',
       title: 'Introduction to Prompt Engineering',
-      description: 'Master the art of crafting effective prompts for large language models.',
+      shortDescription: 'Master the art of crafting effective prompts for large language models.',
       longDescription: 'In this course, you will learn the essential techniques of prompt engineering to get the best results from large language models like Claude. You will explore how to design, refine, and test prompts to guide the model towards generating accurate, relevant, and creative outputs for a wide range of applications.',
       duration: '4 hours',
       level: 'Intermediate',
@@ -78,6 +81,8 @@ export interface Course {
         },
       ],
       image: '/src/assets/ai-hero-bg.jpg',
+      price: 0,
+      isFree: true,
     },
   ];
   

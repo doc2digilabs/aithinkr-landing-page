@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../../lib/supabaseClient';
-import { Course, courses as staticCourses } from '../../lib/courseData';
-import { CheckCircle, Lock, ChevronDown } from 'lucide-react';
-import CoursesLayout from '@/components/courses/Layout';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { supabase } from '@/lib/supabaseClient';
+import { Course, courses as staticCourses } from '@/lib/courseData';
+import { CheckCircle, PlayCircle, ChevronDown, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { toast } from 'sonner';
+import { Layout } from '@/components/layout';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const CoursePlayer: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -16,138 +19,183 @@ const CoursePlayer: React.FC = () => {
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEnrolled, setIsEnrolled] = useState(false);
-  const [session, setSession] = useState<any>(null);
-  const [completedLessons, setCompletedLessons] = useState<string[]>([]);
-  const [activeLesson, setActiveLesson] = useState<string | null>(null);
-  const [openModule, setOpenModule] = useState<number | null>(null);
+  const [completedTopics, setCompletedTopics] = useState<Set<string>>(new Set());
+  const [activeTopic, setActiveTopic] = useState<string | null>(null);
+  const [openModules, setOpenModules] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     const getInitialData = async () => {
-      const { data: sessionData } = await supabase.auth.getSession();
-      setSession(sessionData.session);
+      setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
 
-      if (!sessionData.session) {
+      if (!session?.user) {
+        toast.error("You must be signed in to view this page.");
         navigate('/auth');
         return;
       }
 
       const foundCourse = staticCourses.find((c) => c.id === courseId);
-      if (foundCourse) {
-        setCourse(foundCourse);
-        setIsEnrolled(true);
-        setCompletedLessons([]);
-        const firstTopic = foundCourse.curriculum[0]?.topics[0];
-        setActiveLesson(firstTopic || null);
-        setOpenModule(foundCourse.curriculum[0]?.module || null);
-      } else {
+      if (!foundCourse) {
+        toast.error("Course not found.");
         navigate('/courses');
+        return;
       }
+      
+      const { data, error } = await supabase
+        .from('user_courses')
+        .select('course_id')
+        .eq('user_id', session.user.id)
+        .eq('course_id', foundCourse.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        toast.error("Error verifying enrollment.", { description: error.message });
+        navigate('/courses');
+        return;
+      }
+
+      if (!data) {
+        toast.error("You are not enrolled in this course.");
+        navigate(`/courses/${courseId}`);
+        return;
+      }
+
+      setIsEnrolled(true);
+      setCourse(foundCourse);
+      
+      const firstTopic = foundCourse.curriculum[0]?.topics[0];
+      setActiveTopic(firstTopic || null);
+      setOpenModules(new Set([foundCourse.curriculum[0]?.module]));
+
       setLoading(false);
     };
 
     getInitialData();
   }, [courseId, navigate]);
 
-  const handleLessonClick = (topic: string) => {
-    setActiveLesson(topic);
+  const allTopics = useMemo(() => course?.curriculum.flatMap(m => m.topics) || [], [course]);
+
+  const handleTopicClick = (topic: string) => {
+    setActiveTopic(topic);
   };
 
-  const handleMarkAsCompleted = (topic: string) => {
-    if (!completedLessons.includes(topic)) {
-      setCompletedLessons([...completedLessons, topic]);
+  const handleMarkAsCompleted = () => {
+    if (activeTopic) {
+      const newCompleted = new Set(completedTopics);
+      newCompleted.add(activeTopic);
+      setCompletedTopics(newCompleted);
+      toast.success(`${activeTopic} marked as complete!`);
+      
+      const currentIndex = allTopics.indexOf(activeTopic);
+      if (currentIndex < allTopics.length - 1) {
+        setActiveTopic(allTopics[currentIndex + 1]);
+      }
     }
   };
 
   if (loading) {
-    return <div className="text-center py-12">Loading course...</div>;
-  }
-
-  if (!isEnrolled) {
     return (
-      <div className="text-center py-12">
-        You are not enrolled in this course.
-      </div>
+      <Layout>
+        <div className="container mx-auto py-10">
+          <div className="flex gap-8">
+            <div className="w-1/4">
+              <Skeleton className="h-16 w-full mb-4" />
+              <Skeleton className="h-96 w-full" />
+            </div>
+            <div className="w-3/4">
+              <Skeleton className="h-96 w-full mb-6" />
+              <Skeleton className="h-12 w-1/2" />
+            </div>
+          </div>
+        </div>
+      </Layout>
     );
   }
 
-  if (!course) {
-    return <div className="text-center py-12">Course not found.</div>;
-  }
+  if (!course) return null;
 
   return (
-    <CoursesLayout>
-      <div className="flex bg-gray-100">
-        {/* Sidebar */}
-        <div className="w-1/4 bg-white border-r overflow-y-auto">
-          <div className="p-6">
-            <h2 className="text-xl font-bold mb-4">{course.title}</h2>
-          </div>
-          <nav className="space-y-2 p-4">
-            {course.curriculum.map((module) => (
-              <Collapsible
-                key={module.module}
-                open={openModule === module.module}
-                onOpenChange={() => setOpenModule(openModule === module.module ? null : module.module)}
-              >
-                <CollapsibleTrigger className="w-full text-left">
-                  <div className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-md hover:bg-gray-100">
-                    <h3 className="text-lg font-bold">
-                      {module.title}
-                    </h3>
-                    <ChevronDown className={`h-5 w-5 transition-transform ${openModule === module.module ? 'rotate-180' : ''}`} />
-                  </div>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <ul className="py-2">
-                    {module.topics.map((topic) => (
-                      <li
-                        key={topic}
-                        className={`flex items-center justify-between pl-8 pr-4 py-3 cursor-pointer ${
-                          activeLesson === topic ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-50'
-                        }`}
-                        onClick={() => handleLessonClick(topic)}
-                      >
-                        <span>{topic}</span>
-                        {completedLessons.includes(topic) ? (
-                          <CheckCircle className="w-5 h-5 text-green-500" />
-                        ) : (
-                          <Lock className="w-5 h-5 text-gray-400" />
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </CollapsibleContent>
-              </Collapsible>
-            ))}
-          </nav>
-        </div>
+    <Layout>
+      <div className="container mx-auto py-10">
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Sidebar */}
+          <aside className="w-full md:w-1/4">
+            <div className="sticky top-24">
+              <h1 className="text-2xl font-bold mb-4">{course.title}</h1>
+              <nav className="border rounded-lg">
+                {course.curriculum.map((module) => (
+                  <Collapsible
+                    key={module.module}
+                    open={openModules.has(module.module)}
+                    onOpenChange={(isOpen) => {
+                      const newOpenModules = new Set(openModules);
+                      if (isOpen) newOpenModules.add(module.module);
+                      else newOpenModules.delete(module.module);
+                      setOpenModules(newOpenModules);
+                    }}
+                    className="border-b last:border-b-0"
+                  >
+                    <CollapsibleTrigger className="w-full p-4 text-left hover:bg-gray-100">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold">Module {module.module}: {module.title}</h3>
+                        <ChevronDown className={`h-5 w-5 transition-transform ${openModules.has(module.module) ? 'rotate-180' : ''}`} />
+                      </div>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <ul className="py-1">
+                        {module.topics.map((topic) => (
+                          <li key={topic}>
+                            <button
+                              onClick={() => handleTopicClick(topic)}
+                              className={`w-full text-left flex items-center gap-3 px-6 py-3 text-sm ${
+                                activeTopic === topic ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-gray-50'
+                              }`}
+                            >
+                              {completedTopics.has(topic) ? (
+                                <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                              ) : (
+                                <PlayCircle className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                              )}
+                              {topic}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </CollapsibleContent>
+                  </Collapsible>
+                ))}
+              </nav>
+            </div>
+          </aside>
 
-        {/* Main Content */}
-        <div className="w-3/4 p-12 overflow-y-auto">
-          {activeLesson ? (
-            <div>
-              <h1 className="text-3xl font-bold mb-6">{activeLesson}</h1>
-              <div className="prose lg:prose-xl">
-                <p>
-                  This is the content for the lesson: <strong>{activeLesson}</strong>.
-                  In a real application, this would be fetched from a database and could include text, videos, and interactive exercises.
-                </p>
+          {/* Main Content */}
+          <main className="w-full md:w-3/4">
+            {activeTopic ? (
+              <>
+                <div className="bg-black aspect-video rounded-lg mb-6 flex items-center justify-center">
+                  <p className="text-white">Video placeholder for "{activeTopic}"</p>
+                </div>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-3xl font-bold">{activeTopic}</h2>
+                  <Button onClick={handleMarkAsCompleted} disabled={completedTopics.has(activeTopic)}>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    {completedTopics.has(activeTopic) ? 'Completed' : 'Mark as Complete'}
+                  </Button>
+                </div>
+                <div className="prose prose-lg max-w-none mt-4">
+                  <p>This is the content for the lesson: <strong>{activeTopic}</strong>. In a real application, this would be fetched from a database and could include text, videos, and interactive exercises.</p>
+                </div>
+              </>
+            ) : (
+              <div className="text-center flex flex-col items-center justify-center h-full">
+                <h1 className="text-2xl font-semibold">Welcome to {course.title}!</h1>
+                <p className="text-muted-foreground mt-2">Select a topic from the sidebar to get started.</p>
               </div>
-              <button
-                onClick={() => handleMarkAsCompleted(activeLesson)}
-                className="mt-8 px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                Mark as Completed
-              </button>
-            </div>
-          ) : (
-            <div className="text-center">
-              <h1 className="text-2xl">Select a lesson to begin.</h1>
-            </div>
-          )}
+            )}
+          </main>
         </div>
       </div>
-    </CoursesLayout>
+    </Layout>
   );
 };
 

@@ -21,7 +21,7 @@ import TermsOfServicePage from "./pages/terms-of-service";
 import DashboardPage from "./pages/dashboard";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import CompleteProfilePage from "./pages/complete-profile";
-import { AdminDashboard } from "./components/admin/AdminDashboard";
+import AdminPage from "./pages/admin";
 import { AdminProtectedRoute } from "./components/auth/AdminProtectedRoute";
 import CoursesPage from "./pages/courses";
 import CourseDetailPage from "./pages/course-detail";
@@ -50,7 +50,7 @@ const AppContent = () => {
 
       {/* Admin Protected Routes */}
       <Route element={<AdminProtectedRoute />}>
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin" element={<AdminPage />} />
       </Route>
 
       {/* Protected Routes */}
