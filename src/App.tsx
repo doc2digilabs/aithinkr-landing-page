@@ -25,6 +25,7 @@ import AdminPage from "./pages/admin";
 import { AdminProtectedRoute } from "./components/auth/AdminProtectedRoute";
 import CoursesPage from "./pages/courses";
 import CourseDetailPage from "./pages/course-detail";
+import { AuthProvider } from "./hooks/useAuth";
 import CoursePlayer from "./pages/course-player/CoursePlayer";
 
 const queryClient = new QueryClient();
@@ -73,7 +74,9 @@ const App = () => (
       <Toaster />
       <Sonner position="top-center" richColors />
       <BrowserRouter>
-        <AppContent />
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

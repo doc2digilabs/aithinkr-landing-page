@@ -23,14 +23,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/hooks/useAuth";
 import { Brain, Menu, LogOut, User, LayoutDashboard, Shield } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
-import { Session } from "@supabase/supabase-js";
 import { toast } from "sonner";
 
 export function NavigationBar() {
   const [isOpen, setIsOpen] = React.useState(false);
-  const [session, setSession] = React.useState<Session | null>(null);
+  const { session, user } = useAuth();
   const [isAdmin, setIsAdmin] = React.useState(false);
   const navigate = useNavigate();
 
@@ -48,43 +48,8 @@ export function NavigationBar() {
   };
 
   React.useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      checkUserRole(session?.user || null);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-      await checkUserRole(session?.user || null);
-
-      if (_event === 'SIGNED_IN' && session) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('role, name')
-          .eq('id', session.user.id)
-          .single();
-
-        if (data?.role === 'admin') {
-          navigate('/admin');
-        } else if (data?.name) {
-          navigate('/dashboard');
-        } else {
-          navigate('/complete-profile');
-        }
-      } else if (_event === 'SIGNED_IN' && !session) {
-        const url = new URL(window.location.href);
-        const error = url.searchParams.get('error_description');
-        if (error) {
-          toast.error(error);
-        }
-      }
-      if (_event === 'SIGNED_OUT') {
-        navigate('/auth');
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    checkUserRole(user);
+  }, [user]);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();

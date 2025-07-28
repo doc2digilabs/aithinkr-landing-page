@@ -9,7 +9,7 @@ export interface Course {
     curriculum: {
       module: number;
       title: string;
-      topics: string[];
+      topics: { name: string; videoUrl: string; }[];
     }[];
     image: string;
     price: number;
@@ -34,17 +34,29 @@ export interface Course {
         {
           module: 1,
           title: 'Introduction to the Anthropic API',
-          topics: ['What is Claude?', 'Setting up your environment', 'Making your first API call'],
+          topics: [
+            { name: 'What is Claude?', videoUrl: 'https://www.youtube.com/watch?v=NJu_vB1b3gU' },
+            { name: 'Setting up your environment', videoUrl: 'https://www.youtube.com/watch?v=NJu_vB1b3gU' },
+            { name: 'Making your first API call', videoUrl: 'https://www.youtube.com/watch?v=NJu_vB1b3gU' },
+          ],
         },
         {
           module: 2,
           title: 'Generating Content',
-          topics: ['Creative writing with Claude', 'Summarization and translation', 'Controlling creativity with temperature'],
+          topics: [
+            { name: 'Creative writing with Claude', videoUrl: 'https://www.youtube.com/watch?v=NJu_vB1b3gU' },
+            { name: 'Summarization and translation', videoUrl: 'https://www.youtube.com/watch?v=NJu_vB1b3gU' },
+            { name: 'Controlling creativity with temperature', videoUrl: 'https://www.youtube.com/watch?v=NJu_vB1b3gU' },
+          ],
         },
         {
           module: 3,
           title: 'Building Applications',
-          topics: ['Designing prompts for specific tasks', 'Building a simple Q&A bot', 'Error handling and best practices'],
+          topics: [
+            { name: 'Designing prompts for specific tasks', videoUrl: 'https://www.youtube.com/watch?v=NJu_vB1b3gU' },
+            { name: 'Building a simple Q&A bot', videoUrl: 'https://www.youtube.com/watch?v=NJu_vB1b3gU' },
+            { name: 'Error handling and best practices', videoUrl: 'https://www.youtube.com/watch?v=NJu_vB1b3gU' },
+          ],
         },
       ],
       image: '/src/assets/hero-aithinkr.jpg',
@@ -67,17 +79,29 @@ export interface Course {
         {
           module: 1,
           title: 'The Fundamentals of Prompting',
-          topics: ['Anatomy of a prompt', 'The role of context and constraints', 'Iterative prompt development'],
+          topics: [
+            { name: 'Anatomy of a prompt', videoUrl: 'https://www.youtube.com/watch?v=d_q_tA9gV6A' },
+            { name: 'The role of context and constraints', videoUrl: 'https://www.youtube.com/watch?v=d_q_tA9gV6A' },
+            { name: 'Iterative prompt development', videoUrl: 'https://www.youtube.com/watch?v=d_q_tA9gV6A' },
+          ],
         },
         {
           module: 2,
           title: 'Advanced Prompting Techniques',
-          topics: ['Few-shot prompting', 'Chain-of-thought prompting', 'Generating structured data'],
+          topics: [
+            { name: 'Few-shot prompting', videoUrl: 'https://www.youtube.com/watch?v=d_q_tA9gV6A' },
+            { name: 'Chain-of-thought prompting', videoUrl: 'https://www.youtube.com/watch?v=d_q_tA9gV6A' },
+            { name: 'Generating structured data', videoUrl: 'https://www.youtube.com/watch?v=d_q_tA9gV6A' },
+          ],
         },
         {
           module: 3,
           title: 'Building a Prompt Library',
-          topics: ['Organizing and reusing prompts', 'Creating a style guide for prompts', 'Collaborating on prompt engineering'],
+          topics: [
+            { name: 'Organizing and reusing prompts', videoUrl: 'https://www.youtube.com/watch?v=d_q_tA9gV6A' },
+            { name: 'Creating a style guide for prompts', videoUrl: 'https://www.youtube.com/watch?v=d_q_tA9gV6A' },
+            { name: 'Collaborating on prompt engineering', videoUrl: 'https://www.youtube.com/watch?v=d_q_tA9gV6A' },
+          ],
         },
       ],
       image: '/src/assets/ai-hero-bg.jpg',

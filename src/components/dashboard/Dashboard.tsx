@@ -9,14 +9,20 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import { User, BookOpen, CheckSquare, PlusCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { courses as staticCourses, Course } from "@/lib/courseData";
 import { Skeleton } from "@/components/ui/skeleton";
 
+interface EnrolledCourseWithProgress extends Course {
+  progress: number;
+}
+
 export function Dashboard() {
   const [user, setUser] = useState<any>(null);
-  const [enrolledCourses, setEnrolledCourses] = useState<Course[]>([]);
+  const [enrolledCourses, setEnrolledCourses] = useState<EnrolledCourseWithProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -27,7 +33,6 @@ export function Dashboard() {
       if (user) {
         setUser(user);
         
-        // Fetch enrolled course IDs from the database
         const { data: enrolled, error } = await supabase
           .from('user_courses')
           .select('course_id')
@@ -36,10 +41,27 @@ export function Dashboard() {
         if (error) {
           console.error("Error fetching enrolled courses:", error);
         } else if (enrolled) {
-          // Map IDs to the full course objects from static data
           const enrolledCourseIds = enrolled.map(e => e.course_id);
-          const userCourses = staticCourses.filter(course => enrolledCourseIds.includes(course.id));
-          setEnrolledCourses(userCourses);
+          
+          const { data: progressData, error: progressError } = await supabase
+            .from('user_course_progress')
+            .select('course_id, topic_id')
+            .eq('user_id', user.id);
+
+          if (progressError) {
+            console.error("Error fetching progress:", progressError);
+          }
+
+          const coursesWithProgress = staticCourses
+            .filter(course => enrolledCourseIds.includes(course.id))
+            .map(course => {
+              const totalTopics = course.curriculum.flatMap(m => m.topics).length;
+              const completedTopics = progressData?.filter(p => p.course_id === course.id).length || 0;
+              const progress = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
+              return { ...course, progress };
+            });
+
+          setEnrolledCourses(coursesWithProgress);
         }
       }
       setLoading(false);
@@ -81,8 +103,15 @@ export function Dashboard() {
                     <CardTitle>{course.title}</CardTitle>
                     <CardDescription className="line-clamp-2">{course.shortDescription}</CardDescription>
                   </CardHeader>
-                  <CardContent className="flex-grow">
+                  <CardContent className="flex-grow space-y-4">
                     <img src={course.image} alt={course.title} className="rounded-md object-cover h-40 w-full"/>
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <Label className="text-sm">Progress</Label>
+                        <span className="text-xs font-semibold">{course.progress}%</span>
+                      </div>
+                      <Progress value={course.progress} />
+                    </div>
                   </CardContent>
                   <CardFooter>
                     <Button 
@@ -90,7 +119,7 @@ export function Dashboard() {
                       onClick={() => navigate(`/courses/${course.id}/learn`)}
                     >
                       <BookOpen className="mr-2 h-4 w-4" />
-                      Start Learning
+                      {course.progress > 0 ? 'Continue Learning' : 'Start Course'}
                     </Button>
                   </CardFooter>
                 </Card>

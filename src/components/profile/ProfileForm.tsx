@@ -13,10 +13,11 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabaseClient";
 import { Session } from "@supabase/supabase-js";
+import { useAuth } from "@/hooks/useAuth";
 import { Save, ShieldCheck, AlertCircle, XCircle } from "lucide-react";
 
 const ProfileForm = () => {
-  const [session, setSession] = useState<Session | null>(null);
+  const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [userType, setUserType] = useState<'student' | 'professional' | null>(null);
   const [formData, setFormData] = useState({
@@ -32,43 +33,42 @@ const ProfileForm = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   useEffect(() => {
-    const getSessionAndProfile = async () => {
-      setLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
+    if (authLoading) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-      if (session?.user) {
-        const { data: profile, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
+    const fetchProfile = async () => {
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
 
-        if (error) {
-          toast.error("Error fetching profile", { description: error.message });
-        } else if (profile) {
-          setFormData({
-            email: session.user.email || "",
-            name: profile.name || "",
-            phone_no: profile.phone_no || "",
-            student_stream: profile.student_stream || "",
-            student_subject: profile.student_subject || "",
-            professional_exp: profile.professional_exp || "",
-            company_name: profile.company_name || "",
-          });
+      if (error) {
+        toast.error("Error fetching profile", { description: error.message });
+      } else if (profile) {
+        setFormData({
+          email: user.email || "",
+          name: profile.name || "",
+          phone_no: profile.phone_no || "",
+          student_stream: profile.student_stream || "",
+          student_subject: profile.student_subject || "",
+          professional_exp: profile.professional_exp || "",
+          company_name: profile.company_name || "",
+        });
 
-          // Determine user type based on profile data
-          if (profile.student_stream || profile.student_subject) {
-            setUserType("student");
-          } else if (profile.professional_exp || profile.company_name) {
-            setUserType("professional");
-          }
+        if (profile.student_stream || profile.student_subject) {
+          setUserType("student");
+        } else if (profile.professional_exp || profile.company_name) {
+          setUserType("professional");
         }
       }
       setLoading(false);
     };
-    getSessionAndProfile();
-  }, []);
+    fetchProfile();
+  }, [user, authLoading]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -77,7 +77,7 @@ const ProfileForm = () => {
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!session?.user) return;
+    if (!user) return;
     setLoading(true);
 
     const { name, phone_no, student_stream, student_subject, professional_exp, company_name } = formData;
@@ -94,7 +94,7 @@ const ProfileForm = () => {
     const { error } = await supabase
       .from("profiles")
       .update(profileData)
-      .eq("id", session.user.id);
+      .eq("id", user.id);
 
     if (error) {
       toast.error("Error Updating Profile", { description: error.message });

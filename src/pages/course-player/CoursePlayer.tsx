@@ -11,24 +11,25 @@ import {
 } from "@/components/ui/collapsible";
 import { toast } from 'sonner';
 import { Layout } from '@/components/layout';
+import { useAuth } from '@/hooks/useAuth';
+import ReactPlayer from 'react-player';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const CoursePlayer: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isEnrolled, setIsEnrolled] = useState(false);
   const [completedTopics, setCompletedTopics] = useState<Set<string>>(new Set());
-  const [activeTopic, setActiveTopic] = useState<string | null>(null);
+  const [activeTopic, setActiveTopic] = useState<{ name: string; videoUrl: string; } | null>(null);
   const [openModules, setOpenModules] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    const getInitialData = async () => {
-      setLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
+    if (authLoading) return;
 
-      if (!session?.user) {
+    const getInitialData = async () => {
+      if (!user) {
         toast.error("You must be signed in to view this page.");
         navigate('/auth');
         return;
@@ -44,7 +45,7 @@ const CoursePlayer: React.FC = () => {
       const { data, error } = await supabase
         .from('user_courses')
         .select('course_id')
-        .eq('user_id', session.user.id)
+        .eq('user_id', user.id)
         .eq('course_id', foundCourse.id)
         .single();
 
@@ -60,7 +61,18 @@ const CoursePlayer: React.FC = () => {
         return;
       }
 
-      setIsEnrolled(true);
+      const { data: progressData, error: progressError } = await supabase
+        .from('user_course_progress')
+        .select('topic_id')
+        .eq('user_id', user.id)
+        .eq('course_id', foundCourse.id);
+
+      if (progressError) {
+        toast.error("Error fetching course progress.", { description: progressError.message });
+      } else if (progressData) {
+        setCompletedTopics(new Set(progressData.map(p => p.topic_id)));
+      }
+
       setCourse(foundCourse);
       
       const firstTopic = foundCourse.curriculum[0]?.topics[0];
@@ -71,24 +83,39 @@ const CoursePlayer: React.FC = () => {
     };
 
     getInitialData();
-  }, [courseId, navigate]);
+  }, [courseId, navigate, user, authLoading]);
 
   const allTopics = useMemo(() => course?.curriculum.flatMap(m => m.topics) || [], [course]);
 
-  const handleTopicClick = (topic: string) => {
+  const handleTopicClick = (topic: { name: string; videoUrl: string; }) => {
     setActiveTopic(topic);
   };
 
-  const handleMarkAsCompleted = () => {
-    if (activeTopic) {
+  const handleMarkAsCompleted = async () => {
+    if (activeTopic && course && user) {
       const newCompleted = new Set(completedTopics);
-      newCompleted.add(activeTopic);
+      newCompleted.add(activeTopic.name);
       setCompletedTopics(newCompleted);
-      toast.success(`${activeTopic} marked as complete!`);
-      
-      const currentIndex = allTopics.indexOf(activeTopic);
-      if (currentIndex < allTopics.length - 1) {
-        setActiveTopic(allTopics[currentIndex + 1]);
+
+      const { error } = await supabase
+        .from('user_course_progress')
+        .insert({
+          user_id: user.id,
+          course_id: course.id,
+          topic_id: activeTopic.name,
+        });
+
+      if (error) {
+        toast.error("Failed to save progress.", { description: error.message });
+        const revertedCompleted = new Set(completedTopics);
+        revertedCompleted.delete(activeTopic.name);
+        setCompletedTopics(revertedCompleted);
+      } else {
+        toast.success(`${activeTopic.name} marked as complete!`);
+        const currentIndex = allTopics.findIndex(t => t.name === activeTopic.name);
+        if (currentIndex < allTopics.length - 1) {
+          setActiveTopic(allTopics[currentIndex + 1]);
+        }
       }
     }
   };
@@ -144,19 +171,19 @@ const CoursePlayer: React.FC = () => {
                     <CollapsibleContent>
                       <ul className="py-1">
                         {module.topics.map((topic) => (
-                          <li key={topic}>
+                          <li key={topic.name}>
                             <button
                               onClick={() => handleTopicClick(topic)}
                               className={`w-full text-left flex items-center gap-3 px-6 py-3 text-sm ${
-                                activeTopic === topic ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-gray-50'
+                                activeTopic?.name === topic.name ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-gray-50'
                               }`}
                             >
-                              {completedTopics.has(topic) ? (
+                              {completedTopics.has(topic.name) ? (
                                 <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
                               ) : (
                                 <PlayCircle className="h-5 w-5 text-gray-400 flex-shrink-0" />
                               )}
-                              {topic}
+                              {topic.name}
                             </button>
                           </li>
                         ))}
@@ -172,18 +199,23 @@ const CoursePlayer: React.FC = () => {
           <main className="w-full md:w-3/4">
             {activeTopic ? (
               <>
-                <div className="bg-black aspect-video rounded-lg mb-6 flex items-center justify-center">
-                  <p className="text-white">Video placeholder for "{activeTopic}"</p>
+                <div className="aspect-video rounded-lg mb-6 overflow-hidden">
+                  <ReactPlayer
+                    url={activeTopic.videoUrl}
+                    width="100%"
+                    height="100%"
+                    controls
+                  />
                 </div>
                 <div className="flex justify-between items-center">
-                  <h2 className="text-3xl font-bold">{activeTopic}</h2>
-                  <Button onClick={handleMarkAsCompleted} disabled={completedTopics.has(activeTopic)}>
+                  <h2 className="text-3xl font-bold">{activeTopic.name}</h2>
+                  <Button onClick={handleMarkAsCompleted} disabled={completedTopics.has(activeTopic.name)}>
                     <CheckCircle className="mr-2 h-4 w-4" />
-                    {completedTopics.has(activeTopic) ? 'Completed' : 'Mark as Complete'}
+                    {completedTopics.has(activeTopic.name) ? 'Completed' : 'Mark as Complete'}
                   </Button>
                 </div>
                 <div className="prose prose-lg max-w-none mt-4">
-                  <p>This is the content for the lesson: <strong>{activeTopic}</strong>. In a real application, this would be fetched from a database and could include text, videos, and interactive exercises.</p>
+                  <p>This is the content for the lesson: <strong>{activeTopic.name}</strong>. In a real application, this would be fetched from a database and could include text, videos, and interactive exercises.</p>
                 </div>
               </>
             ) : (
@@ -200,3 +232,4 @@ const CoursePlayer: React.FC = () => {
 };
 
 export default CoursePlayer;
+
