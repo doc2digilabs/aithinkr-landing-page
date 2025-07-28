@@ -27,6 +27,7 @@ import CoursesPage from "./pages/courses";
 import CourseDetailPage from "./pages/course-detail";
 import { AuthProvider } from "./hooks/useAuth";
 import CoursePlayer from "./pages/course-player/CoursePlayer";
+import AgenticDocumentExtractionPage from "./pages/agentic-document-extraction";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,10 @@ const AppContent = () => {
       <Route path="/training" element={<Training />} />
       <Route path="/careers" element={<Careers />} />
       <Route path="/products" element={<Products />} />
+      <Route
+        path="/products/agentic-document-extraction"
+        element={<AgenticDocumentExtractionPage />}
+      />
       <Route path="/research" element={<Research />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/about" element={<About />} />

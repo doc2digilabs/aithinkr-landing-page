@@ -1,6 +1,15 @@
-import { Brain, Code, Users, Zap } from "lucide-react";
+import { Brain, Code, Users, Zap, FileText } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const features = [
+  {
+    title: "AI Document Extraction",
+    description:
+      "Intelligently extract structured information from documents using AI-powered agents. Supports various file types.",
+    icon: FileText,
+    color: "text-green-500",
+    link: "/products/agentic-document-extraction",
+  },
   {
     title: "Powerful AI Models",
     description:
@@ -45,13 +54,12 @@ const Features = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => {
             const IconComponent = feature.icon;
-            return (
+            const cardContent = (
               <div
-                key={index}
-                className="bg-gradient-card rounded-xl p-6 shadow-tech hover:shadow-ai transition-all duration-300 hover:-translate-y-2 border border-border"
+                className="bg-gradient-card rounded-xl p-6 shadow-tech hover:shadow-ai transition-all duration-300 hover:-translate-y-2 border border-border h-full flex flex-col"
               >
                 <div className="flex items-center mb-4">
                   <div
@@ -65,9 +73,23 @@ const Features = () => {
                   {feature.title}
                 </h3>
 
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground flex-grow">
                   {feature.description}
                 </p>
+              </div>
+            );
+
+            if (feature.link) {
+              return (
+                <Link to={feature.link} key={index} className="no-underline">
+                  {cardContent}
+                </Link>
+              );
+            }
+
+            return (
+              <div key={index}>
+                {cardContent}
               </div>
             );
           })}
