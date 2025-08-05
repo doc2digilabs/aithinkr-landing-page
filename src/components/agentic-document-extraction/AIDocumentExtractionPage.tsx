@@ -59,7 +59,7 @@ const AIDocumentExtractionPage: React.FC = () => {
 
     try {
       // Step 1: Upload the file
-      console.log("Step 1: Uploading file to Supabase Storage...");
+      console.log("Step 1: Uploading file to Supabase Storage....");
       const fileName = `${Date.now()}_${activeFile.name}`;
       const storageBucketNamePath = `uploads/${fileName}`;
       const storageBucketName = `aithinkr-upload`;
