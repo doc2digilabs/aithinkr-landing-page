@@ -98,7 +98,8 @@ const AIDocumentExtractionPage: React.FC = () => {
 
         }
       } else {
-        setExtractedData(JSON.parse(extractionData).text);
+        const cleanedData = extractionData.replace(/```json/g, '').replace(/```/g, '');
+        setExtractedData(JSON.parse(cleanedData).text);
       }
     } catch (error: any) {
       console.error("An error occurred in the handleExtract process:", error);
