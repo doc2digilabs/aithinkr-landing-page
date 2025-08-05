@@ -86,9 +86,20 @@ const AIDocumentExtractionPage: React.FC = () => {
       }
 
       console.log("Step 2 complete. Extraction successful.", extractionData);
-      setExtractedData(extractionData);
-      //setExtractedData(null);
+      // Need to remove ```json from the response
+      if (typeof extractionData === 'string') {
+        const cleanedData = extractionData.replace(/```json/g, '').replace(/```/g, '');
+        try {
+          setExtractedData(JSON.parse(cleanedData).text);
+        } catch (parseError) {
+          console.error("Failed to parse extraction data:", parseError);
+          setExtractionError(parseError.message)
+         // throw new Error(`Failed to parse extraction data: ${parseError.message}`);
 
+        }
+      } else {
+        setExtractedData(JSON.parse(extractionData).text);
+      }
     } catch (error: any) {
       console.error("An error occurred in the handleExtract process:", error);
       const errorMessage = error.message || 'An unknown error occurred.';

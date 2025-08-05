@@ -39,10 +39,7 @@ const AppContent = () => {
       <Route path="/training" element={<Training />} />
       <Route path="/careers" element={<Careers />} />
       <Route path="/products" element={<Products />} />
-      <Route
-        path="/products/agentic-document-extraction"
-        element={<AgenticDocumentExtractionPage />}
-      />
+      
       <Route path="/research" element={<Research />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/about" element={<About />} />
@@ -65,6 +62,10 @@ const AppContent = () => {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/complete-profile" element={<CompleteProfilePage />} />
         <Route path="/courses/:courseId/learn" element={<CoursePlayer />} />
+        <Route
+        path="/products/agentic-document-extraction"
+        element={<AgenticDocumentExtractionPage />}
+      />
       </Route>     
 
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
