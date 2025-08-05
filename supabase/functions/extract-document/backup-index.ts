@@ -1,5 +1,8 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+//import { createClient } from '@supabase/supabase-js@2';
+//import { GoogleGenerativeAI } from 'npm:@google/genai';
+//import {GoogleGenAI} from '@google/genai';
 import { GoogleGenAI } from 'npm:@google/genai';
 // --- CORS Headers ---
 // These are necessary to allow your frontend application to call this function.
@@ -55,51 +58,30 @@ serve(async (req)=>{
     };
     // --- Define the Prompt for the LLM ---
     const prompt = `
-      You are a highly intelligent and efficient document processing AI. Your task is to analyze the provided document and extract its text content.
-
-      **Instructions:**
-      1.  Carefully analyze the document image.
-      2.  Extract all readable text from the document.
-      3.  Provide a confidence score (from 0.0 to 1.0) representing your certainty about the accuracy of the extracted text.
-      4.  You MUST return the extracted data in a raw JSON format, without any additional explanations, formatting, or markdown.
-
-      **Output Format:**
-      Return ONLY a valid JSON object with the following structure:
-      {
-        "text": "The full extracted text from the document...",
-        "confidenceScore": 0.95
-      }
+      Analyze the provided document and extract the text .
+      text: extracted text.
+      confidenceScore: A number between 0 and 1 indicating your confidence in the accuracy of the extracted data.
+      return only a JSON with abobe two fileds without any extra character so that I can directly parse the json object
     `;
     // --- Call Gemini API ---
-    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent({
+    const result = await ai.models.generateContent({
+      model: 'gemini-2.0-flash-001',
       contents: [
-        {
-          parts: [
-            { text: prompt },
-            imagePart,
-          ],
-        },
-      ],
+        prompt,
+        imagePart
+      ]
     });
-
-    const response = result.response;
-    const text = response.text();
+    let response = result.text;
     // --- Parse the JSON Response ---
     let extractedData;
     try {
-      if (!text) {
+      if (!response) {
         throw new Error("The model did not return any text to parse.");
       }
-
-      // Clean the response to remove markdown formatting
-      const startIndex = text.indexOf('{');
-      const endIndex = text.lastIndexOf('}');
-      const jsonString = text.substring(startIndex, endIndex + 1);
-
-      extractedData = JSON.parse(jsonString);
+      //  extractedData = JSON.parse(response);
+      extractedData = response;
     } catch (parseError) {
-      console.error("Failed to parse JSON from LLM response:", text);
+      console.error("Failed to parse JSON from LLM response:", response);
       throw new Error("The model returned an invalid data format. Could not parse JSON.");
     }
     // --- Return Success Response ---
