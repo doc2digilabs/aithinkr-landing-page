@@ -4,19 +4,23 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from "@/components/ui/resizable"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileText, Image as ImageIcon, MessageSquare } from 'lucide-react';
+} from "@/components/ui/resizable";
 import FilePanel from './FilePanel';
 import DocumentPanel from './DocumentPanel';
 import ResultPanel from './ResultPanel';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { supabase } from '@/lib/supabaseClient';
+import { log } from 'console';
 
 const AIDocumentExtractionPage: React.FC = () => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [activeFile, setActiveFile] = useState<File | null>(null);
+  
+  // State for the extraction process
   const [extractedData, setExtractedData] = useState<any | null>(null);
   const [extractionError, setExtractionError] = useState<string | null>(null);
+  const [isExtracting, setIsExtracting] = useState(false);
+
   const isMobile = useIsMobile();
 
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
@@ -25,19 +29,12 @@ const AIDocumentExtractionPage: React.FC = () => {
   const leftPanelRef = useRef<React.ElementRef<typeof ResizablePanel>>(null);
   const rightPanelRef = useRef<React.ElementRef<typeof ResizablePanel>>(null);
 
-  const handleExtractionComplete = (data: any) => {
-    setExtractedData(data);
-    setExtractionError(null);
-  };
-
-  const handleExtractionError = (error: string) => {
-    setExtractionError(error);
-    setExtractedData(null);
-  };
-
   const handleFileSelect = (file: File | null) => {
     if (file) {
-      setUploadedFiles(prevFiles => [...prevFiles, file]);
+      // Prevent adding the same file multiple times
+      if (!uploadedFiles.some(f => f.name === file.name && f.size === file.size)) {
+        setUploadedFiles(prevFiles => [...prevFiles, file]);
+      }
       setActiveFile(file);
       setExtractedData(null);
       setExtractionError(null);
@@ -53,18 +50,62 @@ const AIDocumentExtractionPage: React.FC = () => {
     }
   };
 
+  const handleExtract = async () => {
+    if (!activeFile) return;
+
+    setIsExtracting(true);
+    setExtractionError(null);
+    setExtractedData(null);
+
+    try {
+      // Step 1: Upload the file
+      console.log("Step 1: Uploading file to Supabase Storage...");
+      const fileName = `${Date.now()}_${activeFile.name}`;
+      const storageBucketNamePath = `uploads/${fileName}`;
+      const storageBucketName = `aithinkr-upload`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from(storageBucketName)
+        .upload(storageBucketNamePath, activeFile, { cacheControl: '3600', upsert: true });
+
+      if (uploadError) {
+        console.error("UPLOAD FAILED:", uploadError);
+        throw new Error(`Failed to upload file: ${uploadError.message}`);
+      }
+      
+      console.log("Step 1 complete. File uploaded successfully.", uploadData);
+
+     // Step 2: Invoke the extraction function
+      console.log("Step 2: Invoking Supabase Edge Function 'extract-document'...");
+      const { data: extractionData, error: extractionError } = await supabase.functions.invoke('extract-document', {
+        body: { filePath: uploadData.path },
+      });
+
+      if (extractionError) {
+        console.error("EXTRACTION FAILED:", extractionError);
+        throw new Error(`Extraction function failed: ${extractionError.message}`);
+      }
+
+      console.log("Step 2 complete. Extraction successful.", extractionData);
+      setExtractedData(extractionData);
+      //setExtractedData(null);
+
+    } catch (error: any) {
+      console.error("An error occurred in the handleExtract process:", error);
+      const errorMessage = error.message || 'An unknown error occurred.';
+      setExtractionError(errorMessage);
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
   const onToggleLeftPanel = () => {
     const panel = leftPanelRef.current;
-    if (panel) {
-      panel.isCollapsed() ? panel.expand() : panel.collapse();
-    }
+    if (panel) panel.isCollapsed() ? panel.expand() : panel.collapse();
   };
 
   const onToggleRightPanel = () => {
     const panel = rightPanelRef.current;
-    if (panel) {
-      panel.isCollapsed() ? panel.expand() : panel.collapse();
-    }
+    if (panel) panel.isCollapsed() ? panel.expand() : panel.collapse();
   };
 
   const CopyrightNotice = () => (
@@ -74,15 +115,13 @@ const AIDocumentExtractionPage: React.FC = () => {
   );
 
   if (isMobile) {
-    // Mobile view with page scroll
+    // Mobile view needs to be simplified as it doesn't have panels
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-grow p-4 space-y-4">
           <FilePanel 
             onFileSelect={handleFileSelect}
-            onExtractionComplete={handleExtractionComplete}
-            onExtractionError={handleExtractionError}
             uploadedFiles={uploadedFiles}
             activeFile={activeFile}
             setActiveFile={setActiveFile}
@@ -91,7 +130,15 @@ const AIDocumentExtractionPage: React.FC = () => {
             onToggleCollapse={() => {}}
           />
           {activeFile && <DocumentPanel file={activeFile} />}
-          {extractedData && <ResultPanel data={extractedData} error={extractionError} isCollapsed={false} onToggleCollapse={() => {}} />}
+          <ResultPanel 
+            data={extractedData} 
+            error={extractionError} 
+            isCollapsed={false} 
+            onToggleCollapse={() => {}}
+            onExtract={handleExtract}
+            isExtracting={isExtracting}
+            activeFile={activeFile}
+          />
         </main>
         <CopyrightNotice />
       </div>
@@ -115,12 +162,10 @@ const AIDocumentExtractionPage: React.FC = () => {
             collapsedSize={3}
             onCollapse={() => setIsLeftPanelCollapsed(true)}
             onExpand={() => setIsLeftPanelCollapsed(false)}
-            className={isLeftPanelCollapsed ? "min-w-[48px] transition-all duration-300 ease-in-out" : ""}
+            className={isLeftPanelCollapsed ? "min-w-[48px]" : ""}
           >
             <FilePanel 
               onFileSelect={handleFileSelect}
-              onExtractionComplete={handleExtractionComplete}
-              onExtractionError={handleExtractionError}
               uploadedFiles={uploadedFiles}
               activeFile={activeFile}
               setActiveFile={setActiveFile}
@@ -145,13 +190,16 @@ const AIDocumentExtractionPage: React.FC = () => {
             collapsedSize={3}
             onCollapse={() => setIsRightPanelCollapsed(true)}
             onExpand={() => setIsRightPanelCollapsed(false)}
-            className={isRightPanelCollapsed ? "min-w-[48px] transition-all duration-300 ease-in-out" : ""}
+            className={isRightPanelCollapsed ? "min-w-[48px]" : ""}
           >
             <ResultPanel 
               data={extractedData} 
               error={extractionError} 
               isCollapsed={isRightPanelCollapsed}
               onToggleCollapse={onToggleRightPanel}
+              onExtract={handleExtract}
+              isExtracting={isExtracting}
+              activeFile={activeFile}
             />
           </ResizablePanel>
 

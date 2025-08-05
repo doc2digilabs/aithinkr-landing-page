@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload, File as FileIcon, X, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { Upload, File as FileIcon, X, ChevronsLeft } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -13,8 +13,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 interface FilePanelProps {
   onFileSelect: (file: File | null) => void;
-  onExtractionComplete: (data: any) => void;
-  onExtractionError: (error: string) => void;
   uploadedFiles: File[];
   activeFile: File | null;
   setActiveFile: (file: File | null) => void;
@@ -85,8 +83,6 @@ const YourFilesList = ({
 
 const FilePanel: React.FC<FilePanelProps> = ({ 
   onFileSelect, 
-  onExtractionComplete, 
-  onExtractionError,
   uploadedFiles,
   activeFile,
   setActiveFile,
@@ -95,11 +91,7 @@ const FilePanel: React.FC<FilePanelProps> = ({
   onToggleCollapse
 }) => {
   return (
-    <FileUpload
-      onFileSelect={onFileSelect}
-      onExtractionComplete={onExtractionComplete}
-      onExtractionError={onExtractionError}
-    >
+    <FileUpload onFileSelect={onFileSelect}>
       {({ open, getRootProps, getInputProps }) => (
         <div {...getRootProps()} className={cn("h-full flex flex-col p-2 bg-white border-r", isCollapsed && "items-center")}>
           <input {...getInputProps()} />

@@ -14,6 +14,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ file }) => {
     <div className="h-full flex flex-col p-2">
       <div className="flex justify-end items-center mb-2 flex-shrink-0">
         <div className="flex items-center border rounded-md p-1">
+          
           <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
             <ChevronLeft className="h-4 w-4" />
           </Button>

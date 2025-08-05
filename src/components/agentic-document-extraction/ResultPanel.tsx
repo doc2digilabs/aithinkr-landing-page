@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from '@/components/ui/badge';
-import { Download, Copy, Share2, ChevronsRight, MessageSquare, Code } from 'lucide-react';
+import { Download, Copy, Share2, ChevronsRight, MessageSquare, Code, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -12,9 +12,20 @@ interface ResultPanelProps {
   error: string | null;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  onExtract: () => void;
+  isExtracting: boolean;
+  activeFile: File | null;
 }
 
-const ResultPanel: React.FC<ResultPanelProps> = ({ data, error, isCollapsed, onToggleCollapse }) => {
+const ResultPanel: React.FC<ResultPanelProps> = ({
+  data,
+  error,
+  isCollapsed,
+  onToggleCollapse,
+  onExtract,
+  isExtracting,
+  activeFile
+}) => {
   const jsonData = data ? JSON.stringify(data, null, 2) : '';
   const markdownData = data ? '## Extracted Data\n\n```json\n' + jsonData + '\n```' : '';
 
@@ -24,9 +35,18 @@ const ResultPanel: React.FC<ResultPanelProps> = ({ data, error, isCollapsed, onT
         <div className="flex items-center justify-between mb-2 flex-shrink-0">
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">Parse</Button>
-            <Button variant="default" size="sm">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={onExtract}
+              disabled={!activeFile || isExtracting}
+            >
+              {isExtracting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Badge className="mr-2 !bg-blue-500 text-white">New</Badge>
+              )}
               Extract
-              <Badge className="ml-2 !bg-blue-500 text-white">New</Badge>
             </Button>
             <Button variant="outline" size="sm">Chat</Button>
           </div>

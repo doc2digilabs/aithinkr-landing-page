@@ -85,6 +85,7 @@ web_modules/
 .node_repl_history
 
 .gemini-key
+.env
 
 # Output of 'npm pack'
 *.tgz

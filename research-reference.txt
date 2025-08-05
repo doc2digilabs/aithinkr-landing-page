@@ -1,0 +1,32 @@
+
+Train Model
+https://docs.unsloth.ai/
+
+Agentic Document Extraction
+https://landing.ai/
+
+IDEA
+-------------------
+
+Create a multi agent system that generate multiple social media post for a given prompt
+1. Facebook
+2. Instagram
+3. Pinterest
+4. WhatsAapp
+5. Web( google ad and youtube)
+
+-------------------------------------------
+Design a multi agent automative assistant for various query on Create
+
+---------------------------------------------
+
+Create e commerce negotiation pricing agent to bergin with customer
+
+----------------------------------------
+
+Create a document research agent for market analysis for new product lunch
+
+
+Study
+---------------------------
+https://anthropic.skilljar.com/

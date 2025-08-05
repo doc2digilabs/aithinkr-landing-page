@@ -1,79 +1,107 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { GoogleGenerativeAI } from 'npm:@google/generative-ai';
-
-// IMPORTANT: Set these environment variables in your Supabase project's secrets.
-// - SUPABASE_URL: Your project's URL
-// - SUPABASE_ANON_KEY: Your project's anon key
-// - GEMINI_API_KEY: Your Google AI Studio API key
+//import { createClient } from '@supabase/supabase-js@2';
+//import { GoogleGenerativeAI } from 'npm:@google/genai';
+//import {GoogleGenAI} from '@google/genai';
+import { GoogleGenAI } from 'npm:@google/genai';
+// --- CORS Headers ---
+// These are necessary to allow your frontend application to call this function.
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type'
+};
+const SupabaseStorageBucketName = 'aithinkr-upload'; // Change this to your actual bucket name
+// --- Gemini AI Initialization ---
+// IMPORTANT: Set GEMINI_API_KEY in your Supabase project's secrets.
 const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
-const genAI = new GoogleGenerativeAI(geminiApiKey);
-
-serve(async (req) => {
-  const { filePath } = await req.json();
-
-  if (!filePath) {
-    return new Response(JSON.stringify({ error: 'filePath is required' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
+if (!geminiApiKey) {
+  console.error("FATAL: GEMINI_API_KEY is not set in project secrets.");
+}
+serve(async (req)=>{
+  // --- Handle Preflight OPTIONS Request for CORS ---
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', {
+      headers: corsHeaders
     });
   }
-
   try {
-    // Create a Supabase client with the service role key
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
-    // Download the file from storage
-    const { data: fileData, error: downloadError } = await supabaseAdmin.storage
-      .from('document_extractions')
-      .download(filePath);
-
-    if (downloadError) {
-      throw downloadError;
+    const { filePath } = await req.json();
+    if (!filePath) {
+      throw new Error('filePath is required in the request body.');
     }
-
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro-vision' });
-    
-    const arrayBuffer = await fileData.arrayBuffer();
-    const buffer = new Uint8Array(arrayBuffer);
-
+    // --- Supabase Admin Client Initialization ---
+    // These secrets are automatically available in the Supabase Edge Function environment.
+    const supabaseAdmin = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
+    // --- Download File from Storage ---
+    const { data: fileData, error: downloadError } = await supabaseAdmin.storage.from(SupabaseStorageBucketName).download(filePath);
+    if (downloadError) {
+      throw new Error(`Failed to download file from storage: ${downloadError.message}`);
+    }
+    const ai = new GoogleGenAI({
+      apiKey: geminiApiKey,
+      apiVersion: 'v1alpha'
+    });
+    // Convert file to base64
+    const fileBuffer = await fileData.arrayBuffer();
+    const uint8Array = new Uint8Array(fileBuffer);
+    let binaryString = '';
+    for(let i = 0; i < uint8Array.length; i++){
+      binaryString += String.fromCharCode(uint8Array[i]);
+    }
+    const base64String = btoa(binaryString);
     const imagePart = {
       inlineData: {
-        data: btoa(String.fromCharCode(...buffer)),
-        mimeType: fileData.type,
-      },
+        data: base64String,
+        mimeType: fileData.type
+      }
     };
-
+    // --- Define the Prompt for the LLM ---
     const prompt = `
-      Extract the following information from this document:
-      - Invoice Number
-      - Invoice Date
-      - Total Amount Due
-      - Billed To (Name and Address)
-      - List of line items with description, quantity, unit price, and total.
-      
-      Return the data in a structured JSON format.
+      Analyze the provided document and extract the text .
+      text: extracted text.
+      confidenceScore: A number between 0 and 1 indicating your confidence in the accuracy of the extracted data.
+      return only a JSON with abobe two fileds without any extra character so that I can directly parse the json object
     `;
-
-    const result = await model.generateContent([prompt, imagePart]);
-    const response = await result.response;
-    const text = response.text();
-
-    // Assuming the model returns a JSON string, we parse it.
-    // In a real-world scenario, you'd add more robust error handling and parsing.
-    const extractedData = JSON.parse(text);
-
-    return new Response(JSON.stringify(extractedData), {
-      headers: { 'Content-Type': 'application/json' },
+    // --- Call Gemini API ---
+    const result = await ai.models.generateContent({
+      model: 'gemini-2.0-flash-001',
+      contents: [
+        prompt,
+        imagePart
+      ]
     });
-
+    let response = result.text;
+    // --- Parse the JSON Response ---
+    let extractedData;
+    try {
+      if (!response) {
+        throw new Error("The model did not return any text to parse.");
+      }
+      //  extractedData = JSON.parse(response);
+      extractedData = response;
+    } catch (parseError) {
+      console.error("Failed to parse JSON from LLM response:", response);
+      throw new Error("The model returned an invalid data format. Could not parse JSON.");
+    }
+    // --- Return Success Response ---
+    return new Response(JSON.stringify(extractedData), {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json'
+      },
+      status: 200
+    });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
+    // --- Return Error Response ---
+    console.error("Error in Edge Function:", error);
+    return new Response(JSON.stringify({
+      error: error.message
+    }), {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json'
+      },
+      status: 500
     });
   }
 });

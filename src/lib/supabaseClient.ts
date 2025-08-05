@@ -18,3 +18,4 @@ if (supabaseUrl.includes(' ')) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
+

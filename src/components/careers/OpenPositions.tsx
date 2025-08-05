@@ -2,26 +2,26 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
 const positions = [
-  {
-    title: "Research Scientist, Generative AI",
-    location: "San Francisco, CA",
-    department: "Research",
-  },
-  {
-    title: "Machine Learning Engineer, NLP",
-    location: "New York, NY",
-    department: "Engineering",
-  },
-  {
-    title: "Software Engineer, AI Infrastructure",
-    location: "Remote",
-    department: "Engineering",
-  },
-  {
-    title: "Product Manager, AI Products",
-    location: "San Francisco, CA",
-    department: "Product",
-  },
+  // {
+  //   title: "Research Scientist, Generative AI",
+  //   location: "San Francisco, CA",
+  //   department: "Research",
+  // },
+  // {
+  //   title: "Machine Learning Engineer, NLP",
+  //   location: "New York, NY",
+  //   department: "Engineering",
+  // },
+  // {
+  //   title: "Software Engineer, AI Infrastructure",
+  //   location: "Remote",
+  //   department: "Engineering",
+  // },
+  // {
+  //   title: "Product Manager, AI Products",
+  //   location: "San Francisco, CA",
+  //   department: "Product",
+  // },
 ];
 
 const OpenPositions = () => {
