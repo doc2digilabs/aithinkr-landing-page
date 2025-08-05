@@ -76,7 +76,7 @@ const AIDocumentExtractionPage: React.FC = () => {
 
      // Step 2: Invoke the extraction function
       console.log("Step 2: Invoking Supabase Edge Function 'extract-document'...");
-      const { data: extractionData, error: extractionError } = await supabase.functions.invoke('extract-document', {
+      const { data: extractionData, error: extractionError } = await supabase.functions.invoke('gemini-prompt', {
         body: { filePath: uploadData.path },
       });
 
