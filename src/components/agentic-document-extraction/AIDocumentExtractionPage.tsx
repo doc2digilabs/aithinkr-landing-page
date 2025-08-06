@@ -73,7 +73,7 @@ const AIDocumentExtractionPage: React.FC = () => {
     setExtractedData(null);
     setExtractionError(null);
     try {
-      const fileName = `uploads/${user.id}/${Date.now()}_${file.name}`;
+      const fileName = `uploads/${user.id}/${file.name}`;
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from(storageBucketName)
         .upload(fileName, file, { cacheControl: '3600', upsert: false });
@@ -148,10 +148,36 @@ const AIDocumentExtractionPage: React.FC = () => {
     setExtractedData(null);
     try {
       const filePath = activeFile.name;
+
+      // Check for cached result first
+      const { data: cachedData, error: cacheError } = await supabase
+        .from('document_extractions')
+        .select('extracted_text')
+        .eq('user_id', user.id)
+        .eq('document_reference', filePath)
+        .single();
+
+      if (cachedData) {
+        setExtractedData(JSON.parse(cachedData.extracted_text));
+        return;
+      }
+
       const { data: extractionData, error: extractionError } = await supabase.functions.invoke('gemini-prompt', {
         body: { filePath: filePath },
       });
       if (extractionError) throw new Error(`Extraction function failed: ${extractionError.message}`);
+      
+      // Save the new result to the cache
+      if (extractionData) {
+        await supabase
+          .from('document_extractions')
+          .insert({
+            user_id: user.id,
+            document_reference: filePath,
+            extracted_text: JSON.stringify(extractionData),
+          });
+      }
+
       setExtractedData(extractionData);
     } catch (error: any) {
       setExtractionError(error.message || 'An unknown error occurred.');
