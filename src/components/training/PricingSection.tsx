@@ -39,8 +39,8 @@ const PricingSection = () => {
                 </div>
                 
                 <div className="flex items-center justify-center gap-4 mb-4">
-                  <span className="text-2xl text-muted-foreground line-through">Rs.20,000</span>
-                  <span className="text-5xl md:text-6xl font-bold text-foreground">Rs.10,000</span>
+                  <span className="text-2xl text-muted-foreground line-through">Rs.25,000</span>
+                  <span className="text-5xl md:text-6xl font-bold text-foreground">Rs.15,000</span>
                 </div>
                 
                 <p className="text-muted-foreground mb-6">
