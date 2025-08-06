@@ -2,13 +2,20 @@ import { Zap } from "lucide-react";
 
 const integrations = [
   "Google",
-  "Microsoft",
+  "Azure",
+  "AWS",
+  "Salesforce",
+  "Stripe",
+  "Trello",
+  "Asana",
+  "Jira",
   "OpenAI",
-  "Meta",
-  "Tesla",
-  "NVIDIA",
   "Hugging Face",
-  "GitHub",
+  "Antropic",
+  "Mistral AI",
+  "NVIDIA",
+  "Amazon Web Services",
+  "Azure",
 ];
 
 const Integrations = () => {

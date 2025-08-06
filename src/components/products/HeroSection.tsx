@@ -18,22 +18,21 @@ const HeroSection = () => {
         <div className="max-w-4xl mx-auto">
           {/* Main Heading */}
           <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-            AiThinkr: Your Generative AI Platform
+            AiThinkr: Your AI Partner for Innovation
           </h1>
 
           {/* Subtitle */}
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto font-tech">
-            Build, deploy, and scale your generative AI applications with our
-            powerful and easy-to-use platform.
+            Harness the power of AI to transform your business processes, enhance productivity, and drive innovation.
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          {/* <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button variant="hero" size="xl" className="font-semibold">
               <ArrowRight className="w-5 h-5" />
               Learn More
             </Button>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

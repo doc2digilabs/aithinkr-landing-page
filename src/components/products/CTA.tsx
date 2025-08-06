@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const CTA = () => {
   return (
@@ -10,13 +10,14 @@ const CTA = () => {
             Get Started with AiThinkr Today
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Build, deploy, and scale your generative AI applications with our
-            powerful and easy-to-use platform.
+            Experience the future of AI-powered applications. Sign up now and start building your first project with our easy-to-use platform.
           </p>
-          <Button variant="hero" size="xl" className="font-semibold">
-            <ArrowRight className="w-5 h-5" />
-            Get Started for Free
-          </Button>
+           <Link to="/auth">
+                          <Button size="lg" className="group">
+                            Sign Up Now
+                            <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">→</span>
+                          </Button>
+           </Link>
         </div>
       </div>
     </section>

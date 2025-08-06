@@ -5,23 +5,23 @@ import codeImage from "@/assets/features-icons.jpg";
 
 const useCases = [
   {
-    title: "Chatbots and Virtual Assistants",
+    title: "Chatbot Development",
     description:
-      "Build intelligent chatbots and virtual assistants that can understand and respond to natural language.",
+      "Create intelligent chatbots that can handle customer queries, provide support, and enhance user engagement. Our AI-powered chatbots learn from interactions to improve over time.",
     icon: Bot,
     image: chatbotImage,
   },
   {
     title: "Content Generation",
     description:
-      "Generate high-quality content for your blog, website, or social media. From product descriptions to ad copy, we have you covered.",
+      "Generate high-quality content in seconds. From blog posts to marketing copy, our AI can create engaging and relevant text tailored to your audience.",
     icon: FileText,
     image: contentImage,
   },
   {
-    title: "Code Generation",
+    title: " Automate workflows",
     description:
-      "Generate code in any language. From simple scripts to complex applications, we can help you get it done faster.",
+      " Streamline your business processes with AI automation. Reduce manual tasks, improve efficiency, and focus on what matters most.",
     icon: Code,
     image: codeImage,
   },
@@ -36,8 +36,7 @@ const UseCases = () => {
             Use Cases
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Discover how our customers are using our platform to build amazing
-            applications.
+            Discover how AiThinkr can transform your business with our versatile AI solutions.
           </p>
         </div>
 

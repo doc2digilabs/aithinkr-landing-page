@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload, File as FileIcon, X, ChevronsLeft } from 'lucide-react';
+import { Upload, File as FileIcon, X, ChevronsLeft, Database } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -10,25 +10,21 @@ import {
 import FileUpload from './FileUpload';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { FileObject } from '@supabase/storage-js';
+
+type AppFile = File | FileObject;
 
 interface FilePanelProps {
-  onFileSelect: (file: File | null) => void;
-  uploadedFiles: File[];
-  activeFile: File | null;
-  setActiveFile: (file: File | null) => void;
-  removeFile: (file: File) => void;
+  onFileSelect: (file: AppFile | null) => void;
+  onFileUpload: (file: File) => void;
+  uploadedFiles: AppFile[];
+  activeFile: AppFile | null;
+  setActiveFile: (file: AppFile | null) => void;
+  removeFile: (file: AppFile) => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  disabled?: boolean;
 }
-
-const ExampleFilesList = ({ isCollapsed }: { isCollapsed: boolean }) => (
-  <div className="space-y-1 text-sm">
-    <div className="p-2 rounded-md hover:bg-muted cursor-pointer flex items-center gap-2">
-      <FileIcon className="h-5 w-5" />
-      {!isCollapsed && <span>Invoice-Example.pdf</span>}
-    </div>
-  </div>
-);
 
 const YourFilesList = ({ 
   files, 
@@ -37,64 +33,81 @@ const YourFilesList = ({
   removeFile,
   isCollapsed
 }: { 
-  files: File[], 
-  activeFile: File | null,
-  setActiveFile: (file: File) => void,
-  removeFile: (file: File) => void,
+  files: AppFile[], 
+  activeFile: AppFile | null,
+  setActiveFile: (file: AppFile) => void,
+  removeFile: (file: AppFile) => void,
   isCollapsed: boolean
-}) => (
-  <div className="text-sm text-muted-foreground p-1 space-y-1">
-    {files.length === 0 && !isCollapsed && "Your files will appear here."}
-    {files.map((file, index) => (
-      <TooltipProvider key={index} delayDuration={0}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div 
-              onClick={() => setActiveFile(file)}
-              className={cn(
-                "flex items-center justify-between text-sm p-2 rounded-md cursor-pointer",
-                activeFile === file ? "bg-primary text-primary-foreground" : "hover:bg-muted",
-                isCollapsed && "justify-center"
-              )}
-            >
-              <div className="flex items-center gap-2 overflow-hidden">
-                <FileIcon className="h-5 w-5 flex-shrink-0" />
-                {!isCollapsed && <span className="truncate">{file.name}</span>}
+}) => {
+  const getFileName = (file: AppFile) => (file instanceof File ? file.name : file.name.split('/').pop()) || 'unknown';
+  
+  const isFileActive = (file: AppFile) => {
+    if (!activeFile) return false;
+    if (file instanceof File && activeFile instanceof File) {
+      return file.name === activeFile.name && file.size === activeFile.size;
+    }
+    if (!(file instanceof File) && !(activeFile instanceof File)) {
+      return file.id === activeFile.id;
+    }
+    return false;
+  };
+
+  return (
+    <div className="text-sm text-muted-foreground p-1 space-y-1">
+      {files.length === 0 && !isCollapsed && "Your files will appear here."}
+      {files.map((file, index) => (
+        <TooltipProvider key={index} delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div 
+                onClick={() => setActiveFile(file)}
+                className={cn(
+                  "flex items-center justify-between text-sm p-2 rounded-md cursor-pointer",
+                  isFileActive(file) ? "bg-primary text-primary-foreground" : "hover:bg-muted",
+                  isCollapsed && "justify-center"
+                )}
+              >
+                <div className="flex items-center gap-2 overflow-hidden">
+                  {file instanceof File ? <FileIcon className="h-5 w-5 flex-shrink-0" /> : <Database className="h-5 w-5 flex-shrink-0" />}
+                  {!isCollapsed && <span className="truncate">{getFileName(file)}</span>}
+                </div>
+                {!isCollapsed && (
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={(e) => { e.stopPropagation(); removeFile(file); }} 
+                    className="h-6 w-6 hover:bg-destructive/20"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
-              {!isCollapsed && (
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={(e) => { e.stopPropagation(); removeFile(file); }} 
-                  className="h-6 w-6 hover:bg-destructive/20"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          </TooltipTrigger>
-          {isCollapsed && <TooltipContent side="right">{file.name}</TooltipContent>}
-        </Tooltip>
-      </TooltipProvider>
-    ))}
-  </div>
-);
+            </TooltipTrigger>
+            {isCollapsed && <TooltipContent side="right">{getFileName(file)}</TooltipContent>}
+          </Tooltip>
+        </TooltipProvider>
+      ))}
+    </div>
+  );
+};
 
 
 const FilePanel: React.FC<FilePanelProps> = ({ 
-  onFileSelect, 
+  onFileSelect,
+  onFileUpload,
   uploadedFiles,
   activeFile,
   setActiveFile,
   removeFile,
   isCollapsed,
-  onToggleCollapse
+  onToggleCollapse,
+  disabled = false
 }) => {
   return (
-    <FileUpload onFileSelect={onFileSelect}>
+    <FileUpload onFileSelect={onFileUpload} disabled={disabled}>
       {({ open, getRootProps, getInputProps }) => (
-        <div {...getRootProps()} className={cn("h-full flex flex-col p-2 bg-white border-r", isCollapsed && "items-center")}>
-          <input {...getInputProps()} />
+        <div {...getRootProps({onClick: e => e.preventDefault()})} className={cn("h-full flex flex-col p-2 bg-white border-r", isCollapsed && "items-center", disabled && "opacity-50 cursor-not-allowed")}>
+          <input {...getInputProps()} disabled={disabled} />
           
           <div className={cn("w-full", isCollapsed ? "flex flex-col items-center" : "")}>
             <div className={cn("flex items-center w-full", isCollapsed ? "justify-center" : "justify-between")}>
@@ -107,7 +120,7 @@ const FilePanel: React.FC<FilePanelProps> = ({
             <TooltipProvider delayDuration={0}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button className={cn("w-full mt-3", isCollapsed && "w-auto")} onClick={open} size={isCollapsed ? "icon" : "default"}>
+                  <Button className={cn("w-full mt-3", isCollapsed && "w-auto")} onClick={open} size={isCollapsed ? "icon" : "default"} disabled={disabled}>
                     <Upload className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
                     {!isCollapsed && "Upload"}
                   </Button>
@@ -116,16 +129,10 @@ const FilePanel: React.FC<FilePanelProps> = ({
               </Tooltip>
             </TooltipProvider>
 
-            {!isCollapsed && <p className="text-xs text-muted-foreground text-center mt-1">JPG, PNG, PDF</p>}
+            {!isCollapsed && <p className="text-xs text-muted-foreground text-center mt-1">{disabled ? "Please log in to upload" : "JPG, PNG, PDF"}</p>}
 
-            <Accordion type="multiple" defaultValue={['item-1', 'item-2']} className={cn("w-full mt-4", isCollapsed && "hidden")}>
+            <Accordion type="single" collapsible defaultValue={'item-1'} className={cn("w-full mt-4", isCollapsed && "hidden")}>
               <AccordionItem value="item-1">
-                <AccordionTrigger className="text-sm">Example Files</AccordionTrigger>
-                <AccordionContent>
-                  <ExampleFilesList isCollapsed={isCollapsed} />
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-2">
                 <AccordionTrigger className="text-sm">Your Files</AccordionTrigger>
                 <AccordionContent>
                   <YourFilesList 

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Header from "@/components/products/Header";
 import {
   ResizableHandle,
@@ -10,13 +10,19 @@ import DocumentPanel from './DocumentPanel';
 import ResultPanel from './ResultPanel';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/lib/supabaseClient';
-import { log } from 'console';
+import { FileObject } from '@supabase/storage-js';
+import { useAuth } from '@/hooks/useAuth';
+import { ConfirmationDialog } from './ConfirmationDialog'; // Import the dialog
+
+// Define a type that can be either a local File or a remote Supabase FileObject
+type AppFile = File | FileObject;
 
 const AIDocumentExtractionPage: React.FC = () => {
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [activeFile, setActiveFile] = useState<File | null>(null);
+  const { user } = useAuth();
+  const [localFiles, setLocalFiles] = useState<File[]>([]);
+  const [supabaseFiles, setSupabaseFiles] = useState<FileObject[]>([]);
+  const [activeFile, setActiveFile] = useState<AppFile | null>(null);
   
-  // State for the extraction process
   const [extractedData, setExtractedData] = useState<any | null>(null);
   const [extractionError, setExtractionError] = useState<string | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
@@ -29,83 +35,126 @@ const AIDocumentExtractionPage: React.FC = () => {
   const leftPanelRef = useRef<React.ElementRef<typeof ResizablePanel>>(null);
   const rightPanelRef = useRef<React.ElementRef<typeof ResizablePanel>>(null);
 
-  const handleFileSelect = (file: File | null) => {
-    if (file) {
-      // Prevent adding the same file multiple times
-      if (!uploadedFiles.some(f => f.name === file.name && f.size === file.size)) {
-        setUploadedFiles(prevFiles => [...prevFiles, file]);
+  const [fileToDelete, setFileToDelete] = useState<AppFile | null>(null);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+
+  const storageBucketName = 'aithinkr-upload';
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchFiles = async () => {
+      const userFolderPath = `uploads/${user.id}`;
+      const { data, error } = await supabase.storage.from(storageBucketName).list(userFolderPath, {
+        limit: 100,
+        offset: 0,
+        sortBy: { column: 'created_at', order: 'desc' },
+      });
+      if (error) {
+        if (error.message.includes('not found')) {
+          setSupabaseFiles([]);
+        } else {
+          setExtractionError(`Failed to fetch files: ${error.message}`);
+        }
+      } else if (data) {
+        const filesWithFullPath = data.map(file => ({...file, name: `${userFolderPath}/${file.name}`}))
+        setSupabaseFiles(filesWithFullPath);
       }
+    };
+    fetchFiles();
+  }, [user]);
+
+  const handleUploadAndSelect = async (file: File) => {
+    if (!user) {
+      setExtractionError("You must be logged in to upload files.");
+      return;
+    }
+    setActiveFile(file);
+    setExtractedData(null);
+    setExtractionError(null);
+    try {
+      const fileName = `uploads/${user.id}/${Date.now()}_${file.name}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from(storageBucketName)
+        .upload(fileName, file, { cacheControl: '3600', upsert: false });
+      if (uploadError) throw new Error(`Failed to upload file: ${uploadError.message}`);
+      const { data, error } = await supabase.storage.from(storageBucketName).list(`uploads/${user.id}`, { search: fileName.replace(`uploads/${user.id}/`, '') });
+      if (error || !data || data.length === 0) throw new Error('Could not retrieve uploaded file from storage.');
+      const newSupabaseFile = {...data[0], name: `uploads/${user.id}/${data[0].name}`};
+      setSupabaseFiles(prev => [newSupabaseFile, ...prev]);
+      setActiveFile(newSupabaseFile);
+      setLocalFiles(prev => prev.filter(f => f.name !== file.name));
+    } catch (error: any) {
+      setExtractionError(error.message || 'An unknown error occurred during upload.');
+      setActiveFile(null);
+    }
+  };
+
+  const handleFileSelect = (file: AppFile | null) => {
+    if (file) {
       setActiveFile(file);
       setExtractedData(null);
       setExtractionError(null);
     }
   };
 
-  const handleRemoveFile = (fileToRemove: File) => {
-    setUploadedFiles(prevFiles => prevFiles.filter(f => f !== fileToRemove));
-    if (activeFile === fileToRemove) {
+  const handleDeleteRequest = (file: AppFile) => {
+    setFileToDelete(file);
+    setIsConfirmDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!fileToDelete) return;
+
+    const fileName = fileToDelete instanceof File ? fileToDelete.name : fileToDelete.name;
+    
+    if (fileToDelete instanceof File) {
+      setLocalFiles(prevFiles => prevFiles.filter(f => f !== fileToDelete));
+    } else {
+      setSupabaseFiles(prevFiles => prevFiles.filter(f => f.id !== fileToDelete.id));
+      const { error } = await supabase.storage.from(storageBucketName).remove([fileName]);
+      if (error) {
+        setExtractionError(`Failed to delete file: ${error.message}`);
+        // TODO: Add file back to list on error
+      }
+    }
+    
+    // Clear active file if it was the one deleted
+    if (activeFile && ('name' in activeFile && 'size' in activeFile) && ('name' in fileToDelete && 'size' in fileToDelete) && activeFile.name === fileToDelete.name && activeFile.size === fileToDelete.size) {
+      setActiveFile(null);
+      setExtractedData(null);
+      setExtractionError(null);
+    } else if (activeFile && !('size' in activeFile) && !('size' in fileToDelete) && activeFile.id === fileToDelete.id) {
       setActiveFile(null);
       setExtractedData(null);
       setExtractionError(null);
     }
+
+    setIsConfirmDialogOpen(false);
+    setFileToDelete(null);
   };
 
   const handleExtract = async () => {
-    if (!activeFile) return;
-
+    if (!activeFile || activeFile instanceof File) {
+      setExtractionError("Please select an uploaded file to extract.");
+      return;
+    }
+    if (!user) {
+      setExtractionError("You must be logged in to extract documents.");
+      return;
+    }
     setIsExtracting(true);
     setExtractionError(null);
     setExtractedData(null);
-
     try {
-      // Step 1: Upload the file
-      console.log("Step 1: Uploading file to Supabase Storage...");
-      const fileName = `${Date.now()}_${activeFile.name}`;
-      const storageBucketNamePath = `uploads/${fileName}`;
-      const storageBucketName = `aithinkr-upload`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from(storageBucketName)
-        .upload(storageBucketNamePath, activeFile, { cacheControl: '3600', upsert: true });
-
-      if (uploadError) {
-        console.error("UPLOAD FAILED:", uploadError);
-        throw new Error(`Failed to upload file: ${uploadError.message}`);
-      }
-      
-      console.log("Step 1 complete. File uploaded successfully.", uploadData);
-
-     // Step 2: Invoke the extraction function
-      console.log("Step 2: Invoking Supabase Edge Function 'extract-document'...");
+      const filePath = activeFile.name;
       const { data: extractionData, error: extractionError } = await supabase.functions.invoke('gemini-prompt', {
-        body: { filePath: uploadData.path },
+        body: { filePath: filePath },
       });
-
-      if (extractionError) {
-        console.error("EXTRACTION FAILED:", extractionError);
-        throw new Error(`Extraction function failed: ${extractionError.message}`);
-      }
-
-      console.log("Step 2 complete. Extraction successful.", extractionData);
-      // Need to remove ```json from the response
+      if (extractionError) throw new Error(`Extraction function failed: ${extractionError.message}`);
       setExtractedData(extractionData);
-      // if (typeof extractionData === 'string') {
-      //   const cleanedData = extractionData.replace(/```json/g, '').replace(/```/g, '');
-      //   try {
-      //     setExtractedData(JSON.parse(cleanedData).text);
-      //   } catch (parseError) {
-      //     console.error("Failed to parse extraction data:", parseError);
-      //     setExtractionError(parseError.message)
-      //    // throw new Error(`Failed to parse extraction data: ${parseError.message}`);
-
-      //   }
-      // } else {
-      //   const cleanedData = extractionData.replace(/```json/g, '').replace(/```/g, '');
-      //   setExtractedData(JSON.parse(cleanedData).text);
-      // }
     } catch (error: any) {
-      console.error("An error occurred in the handleExtract process:", error);
-      const errorMessage = error.message || 'An unknown error occurred.';
-      setExtractionError(errorMessage);
+      setExtractionError(error.message || 'An unknown error occurred.');
     } finally {
       setIsExtracting(false);
     }
@@ -127,20 +176,23 @@ const AIDocumentExtractionPage: React.FC = () => {
     </footer>
   );
 
+  const combinedFiles = [...localFiles, ...supabaseFiles];
+
   if (isMobile) {
-    // Mobile view needs to be simplified as it doesn't have panels
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-grow p-4 space-y-4">
           <FilePanel 
             onFileSelect={handleFileSelect}
-            uploadedFiles={uploadedFiles}
+            onFileUpload={handleUploadAndSelect}
+            uploadedFiles={combinedFiles}
             activeFile={activeFile}
             setActiveFile={setActiveFile}
-            removeFile={handleRemoveFile}
+            removeFile={handleDeleteRequest}
             isCollapsed={false}
             onToggleCollapse={() => {}}
+            disabled={!user}
           />
           {activeFile && <DocumentPanel file={activeFile} />}
           <ResultPanel 
@@ -179,18 +231,20 @@ const AIDocumentExtractionPage: React.FC = () => {
           >
             <FilePanel 
               onFileSelect={handleFileSelect}
-              uploadedFiles={uploadedFiles}
+              onFileUpload={handleUploadAndSelect}
+              uploadedFiles={combinedFiles}
               activeFile={activeFile}
               setActiveFile={setActiveFile}
-              removeFile={handleRemoveFile}
+              removeFile={handleDeleteRequest}
               isCollapsed={isLeftPanelCollapsed}
               onToggleCollapse={onToggleLeftPanel}
+              disabled={!user}
             />
           </ResizablePanel>
           
           <ResizableHandle withHandle />
           
-          <ResizablePanel defaultSize={45}>
+          <ResizablePanel>
             <DocumentPanel file={activeFile} />
           </ResizablePanel>
           
@@ -218,6 +272,13 @@ const AIDocumentExtractionPage: React.FC = () => {
 
         </ResizablePanelGroup>
       </main>
+      <ConfirmationDialog
+        isOpen={isConfirmDialogOpen}
+        onClose={() => setIsConfirmDialogOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Are you sure?"
+        description="This action cannot be undone. This will permanently delete the file from storage."
+      />
       <CopyrightNotice />
     </div>
   );
