@@ -1,5 +1,5 @@
 
-import WhatYoullLearn from "@/components/training/WhatYoullLearn"
+import FreeClassCTA from "@/components/training/FreeClassCTA";
 import ProjectShowcase from "@/components/training/ProjectShowcase"
 import ToolsTechnologies from "@/components/training/ToolsTechnologies"
 import WhoShouldJoin from "@/components/training/WhoShouldJoin"
@@ -9,6 +9,8 @@ import PricingSection from "@/components/training/PricingSection"
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/training/Header"
 import HeroSection from "@/components/training/HeroSection"
+import WhatYouWillLearn from "@/components/training/WhatYouWillLearn";
+import CurriculumAccordion from "@/components/training/CurriculumAccordion";
 
 const TrainingPage = () => {
   return (
@@ -16,12 +18,16 @@ const TrainingPage = () => {
       <Header />
       <main>
         <HeroSection />
-        <WhatYoullLearn />
+        <FreeClassCTA />
+        <Testimonials />
+        <WhatYouWillLearn />
+        <div id="curriculum">
+          <CurriculumAccordion />
+        </div>
         <ProjectShowcase />
         <ToolsTechnologies />
         <WhoShouldJoin />
         <CareerOutcomes />
-        <Testimonials />
         <PricingSection />
       </main>
       <Footer />

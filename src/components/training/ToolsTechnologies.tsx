@@ -1,112 +1,62 @@
 import { 
-  Brain, Code, Database, Cloud, 
-  Cpu, Layers, Zap, GitBranch 
-} from "lucide-react"
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 const technologies = [
-  {
-    category: "AI/ML Frameworks",
-    icon: Brain,
-    tools: ["PyTorch", "TensorFlow", "Scikit-learn", "Hugging Face"],
-    color: "text-blue-500"
-  },
-  {
-    category: "Programming Languages",
-    icon: Code,
-    tools: ["Python", "JavaScript", "SQL", "R"],
-    color: "text-green-500"
-  },
-  {
-    category: "AI APIs & Services",
-    icon: Zap,
-    tools: ["OpenAI API", "LangChain", "Anthropic", "Cohere"],
-    color: "text-purple-500"
-  },
-  {
-    category: "Data & Databases",
-    icon: Database,
-    tools: ["PostgreSQL", "MongoDB", "Pinecone", "Weaviate"],
-    color: "text-cyan-500"
-  },
-  {
-    category: "Cloud Platforms",
-    icon: Cloud,
-    tools: ["AWS", "Google Cloud", "Azure", "Hugging Face Spaces"],
-    color: "text-orange-500"
-  },
-  {
-    category: "Computer Vision",
-    icon: Layers,
-    tools: ["OpenCV", "YOLO", "Roboflow", "Detectron2"],
-    color: "text-pink-500"
-  },
-  {
-    category: "MLOps Tools",
-    icon: GitBranch,
-    tools: ["MLflow", "Docker", "Kubernetes", "GitHub Actions"],
-    color: "text-indigo-500"
-  },
-  {
-    category: "Development Tools",
-    icon: Cpu,
-    tools: ["Jupyter", "VS Code", "Git", "Streamlit"],
-    color: "text-teal-500"
-  }
-]
+  { name: "PyTorch", logo: "/logos/pytorch.svg", description: "A popular open-source machine learning library." },
+  { name: "TensorFlow", logo: "/logos/tensorflow.svg", description: "An end-to-end open-source platform for machine learning." },
+  { name: "Scikit-learn", logo: "/logos/scikit-learn.svg", description: "A machine learning library for Python." },
+  { name: "Hugging Face", logo: "/logos/hugging-face.svg", description: "A community and data science platform for AI." },
+  { name: "Python", logo: "/logos/python.svg", description: "A high-level, general-purpose programming language." },
+  { name: "JavaScript", logo: "/logos/javascript.svg", description: "A programming language that conforms to the ECMAScript specification." },
+  { name: "SQL", logo: "/logos/sql.svg", description: "A domain-specific language used in programming and designed for managing data held in a relational database management system." },
+  { name: "OpenAI API", logo: "/logos/openai.svg", description: "An API for accessing new AI models developed by OpenAI." },
+  { name: "LangChain", logo: "/logos/langchain.svg", description: "A framework for developing applications powered by language models." },
+  { name: "PostgreSQL", logo: "/logos/postgresql.svg", description: "A free and open-source relational database management system." },
+  { name: "MongoDB", logo: "/logos/mongodb.svg", description: "A source-available cross-platform document-oriented database program." },
+  { name: "Pinecone", logo: "/logos/pinecone.svg", description: "A vector database for machine learning applications." },
+  { name: "AWS", logo: "/logos/aws.svg", description: "A subsidiary of Amazon providing on-demand cloud computing platforms and APIs." },
+  { name: "Google Cloud", logo: "/logos/google-cloud.svg", description: "A suite of cloud computing services that runs on the same infrastructure that Google uses internally for its end-user products." },
+  { name: "Azure", logo: "/logos/azure.svg", description: "A cloud computing service created by Microsoft for building, testing, deploying, and managing applications and services through Microsoft-managed data centers." },
+  { name: "OpenCV", logo: "/logos/opencv.svg", description: "A library of programming functions mainly aimed at real-time computer vision." },
+  { name: "YOLO", logo: "/logos/yolo.svg", description: "A real-time object detection system." },
+  { name: "MLflow", logo: "/logos/mlflow.svg", description: "An open source platform to manage the ML lifecycle, including experimentation, reproducibility, deployment, and a central model registry." },
+  { name: "Docker", logo: "/logos/docker.svg", description: "A set of platform as a service products that use OS-level virtualization to deliver software in packages called containers." },
+  { name: "Kubernetes", logo: "/logos/kubernetes.svg", description: "An open-source container-orchestration system for automating computer application deployment, scaling, and management." },
+];
 
 const ToolsTechnologies = () => {
   return (
-    <section className="py-20 bg-gradient-tech">
+    <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">
-            Tools & Technologies
+          <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-gray-800">
+            Master the Tools of the Trade
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Master the industry-standard tools used by top AI companies worldwide
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            You'll gain hands-on experience with the same industry-standard technologies used by leading AI companies.
           </p>
         </div>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {technologies.map((tech, index) => {
-            const IconComponent = tech.icon
-            return (
-              <div 
-                key={index}
-                className="bg-gradient-card rounded-xl p-6 shadow-tech hover:shadow-ai transition-all duration-300 hover:-translate-y-1 border border-border"
-              >
-                <div className="flex items-center mb-4">
-                  <div className={`p-2 rounded-lg bg-background ${tech.color}`}>
-                    <IconComponent className="w-5 h-5" />
+        <div className="flex flex-wrap justify-center gap-8">
+          {technologies.map((tech, index) => (
+            <TooltipProvider key={index} delayDuration={100}>
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="bg-gray-100 rounded-lg p-4 transition-all duration-300 hover:bg-gray-200 hover:shadow-md hover:-translate-y-1">
+                    <img src={tech.logo} alt={tech.name} className="h-12 w-12" />
                   </div>
-                  <h3 className="ml-3 font-semibold text-sm font-display">
-                    {tech.category}
-                  </h3>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-2">
-                  {tech.tools.map((tool, toolIndex) => (
-                    <div 
-                      key={toolIndex}
-                      className="text-xs font-medium text-center py-2 px-3 bg-background rounded-lg border border-border text-foreground hover:bg-accent transition-colors"
-                    >
-                      {tool}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-        
-        <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-4 bg-gradient-card rounded-lg p-4 shadow-tech">
-            <Cpu className="w-8 h-8 text-primary" />
-            <div className="text-left">
-              <div className="font-semibold">Industry Standard</div>
-              <div className="text-sm text-muted-foreground">Learn the exact tools used by AI engineers at top companies</div>
-            </div>
-          </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="font-semibold">{tech.name}</p>
+                  <p className="text-sm text-muted-foreground">{tech.description}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ))}
         </div>
       </div>
     </section>

@@ -1,9 +1,17 @@
+
 import { Button } from "@/components/ui/button"
-import { Calendar, Download, Sparkles, Users } from "lucide-react"
+import { Calendar, Sparkles, Users, ArrowDown } from "lucide-react"
 import heroImage from "@/assets/ai-hero-bg.jpg"
 import { Link } from "react-router-dom"
 
 const HeroSection = () => {
+  const scrollToCurriculum = () => {
+    const curriculumSection = document.getElementById("curriculum");
+    if (curriculumSection) {
+      curriculumSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section className="relative py-24 lg:py-8 overflow-hidden">
       {/* Background Image with Overlay */}
@@ -64,9 +72,9 @@ const HeroSection = () => {
               </Button>
             </Link>
             <div className="flex gap-4">
-              <Button variant="outline" size="lg">
-                <Download className="w-5 h-5 mr-2" />
-                Download Brochure
+              <Button variant="outline" size="lg" onClick={scrollToCurriculum}>
+                <ArrowDown className="w-5 h-5 mr-2" />
+                See Full Curriculum
               </Button>
               <Button variant="ghost" size="lg">
                 <Calendar className="w-5 h-5 mr-2" />
