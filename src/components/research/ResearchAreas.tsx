@@ -16,6 +16,20 @@ const researchAreas = [
     color: "text-cyan-500",
   },
   {
+    title: "Fine Tuning and Customization using LoRA, QLoRA and PEFT",
+    description:
+      "We are exploring advanced techniques like LoRA, QLoRA, and PEFT for fine-tuning and customizing large language models to improve performance on specific tasks.",
+    icon: Zap,
+    color: "text-green-500",
+  },
+  {
+    title: "distilation, quantization and pruning of large language models",
+    description:
+      "We are researching methods to distill, quantize, and prune large language models to make them more efficient and accessible for various applications.",
+    icon: Brain,
+    color: "text-yellow-500",
+  },
+   {
     title: "AI for Education",
     description:
       "We are developing AI solutions to enhance the learning experience, including personalized learning, intelligent tutoring systems, and educational content generation.",
