@@ -76,12 +76,7 @@ export function NavigationBar() {
             <span className="hidden font-bold sm:inline-block text-2xl">AiThinkr</span>
           </Link>
           <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <Link to="/training" className={navigationMenuTriggerStyle()}>
-                  Training
-                </Link>
-              </NavigationMenuItem>
+            <NavigationMenuList>              
               <NavigationMenuItem>
                 <Link to="/products" className={navigationMenuTriggerStyle()}>
                   Products
@@ -106,6 +101,11 @@ export function NavigationBar() {
               <NavigationMenuItem>
                 <Link to="/courses" className={navigationMenuTriggerStyle()}>
                   Courses
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link to="/training" className={navigationMenuTriggerStyle()}>
+                  Training
                 </Link>
               </NavigationMenuItem>
             </NavigationMenuList>
