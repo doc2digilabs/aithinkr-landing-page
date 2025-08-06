@@ -1,40 +1,36 @@
-import { Brain, Database, Rocket, TrendingUp, DollarSign, MapPin } from "lucide-react"
+import { Brain, Database, Rocket, TrendingUp, IndianRupee , MapPin } from "lucide-react"
 
 const roles = [
   {
     title: "AI/ML Engineer",
     description: "Design and implement machine learning algorithms and AI systems for real-world applications",
-    salary: "$120k - $200k",
+    salary: "12L - 20L",
     icon: Brain,
     skills: ["Deep Learning", "Python", "TensorFlow", "Model Deployment"],
-    companies: ["Google", "Microsoft", "OpenAI", "Meta"],
     gradient: "from-blue-500 to-cyan-500"
   },
   {
     title: "LLM Developer",
     description: "Build applications using Large Language Models and develop custom AI-powered solutions",
-    salary: "$110k - $180k", 
+    salary: "8L - 16L", 
     icon: Rocket,
     skills: ["LangChain", "OpenAI API", "Vector DBs", "Prompt Engineering"],
-    companies: ["Anthropic", "Cohere", "Hugging Face", "Stability AI"],
     gradient: "from-purple-500 to-pink-500"
   },
   {
     title: "MLOps Engineer",
     description: "Build and maintain ML infrastructure, CI/CD pipelines, and production ML systems",
-    salary: "$130k - $220k",
+    salary: "10L - 15L",
     icon: Database,
     skills: ["Docker", "Kubernetes", "MLflow", "Cloud Platforms"],
-    companies: ["Netflix", "Uber", "Airbnb", "Spotify"],
     gradient: "from-green-500 to-teal-500"
   },
   {
     title: "AI Product Manager",
     description: "Lead AI product development and strategy, bridging technical and business requirements",
-    salary: "$140k - $250k",
+    salary: "40L - 60L",
     icon: TrendingUp,
     skills: ["AI Strategy", "Product Management", "Technical Writing", "Analytics"],
-    companies: ["Apple", "Amazon", "Tesla", "Salesforce"],
     gradient: "from-orange-500 to-red-500"
   }
 ]
@@ -70,7 +66,7 @@ const CareerOutcomes = () => {
                     </div>
                     <div className="text-right">
                       <div className="flex items-center text-green-600 font-semibold">
-                        <DollarSign className="w-4 h-4 mr-1" />
+                        <IndianRupee  className="w-4 h-4 mr-1" />
                         {role.salary}
                       </div>
                       <div className="text-xs text-muted-foreground">Annual Salary</div>
@@ -99,7 +95,7 @@ const CareerOutcomes = () => {
                     </div>
                   </div>
                   
-                  <div>
+                  {/* <div>
                     <h4 className="font-semibold text-sm mb-3">Hiring Companies:</h4>
                     <div className="flex flex-wrap gap-3">
                       {role.companies.map((company, companyIndex) => (
@@ -111,7 +107,7 @@ const CareerOutcomes = () => {
                         </span>
                       ))}
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             )
@@ -119,7 +115,7 @@ const CareerOutcomes = () => {
         </div>
         
         {/* Success Stats */}
-        <div className="bg-gradient-card rounded-xl p-8 shadow-tech border border-border">
+        {/* <div className="bg-gradient-card rounded-xl p-8 shadow-tech border border-border">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-3xl font-bold text-primary mb-2">95%</div>
@@ -138,7 +134,7 @@ const CareerOutcomes = () => {
               <div className="text-sm text-muted-foreground">Alumni Network</div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   )

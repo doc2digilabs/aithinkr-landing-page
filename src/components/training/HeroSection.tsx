@@ -46,11 +46,11 @@ const HeroSection = () => {
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-8 mb-10">
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary">8</div>
+              <div className="text-3xl font-bold text-primary">12</div>
               <div className="text-sm text-muted-foreground">Weeks</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary">3+</div>
+              <div className="text-3xl font-bold text-primary">10+</div>
               <div className="text-sm text-muted-foreground">Projects</div>
             </div>
             {/* <div className="text-center">
@@ -65,21 +65,21 @@ const HeroSection = () => {
           
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link to="/register">
+            {/* <Link to="/register">
               <Button variant="hero" size="xl" className="font-semibold shadow-lg hover:shadow-primary/40 transition-all duration-300 transform hover:-translate-y-1">
                 <Users className="w-5 h-5 mr-2" />
                 Apply Now
               </Button>
-            </Link>
+            </Link> */}
             <div className="flex gap-4">
               <Button variant="outline" size="lg" onClick={scrollToCurriculum}>
                 <ArrowDown className="w-5 h-5 mr-2" />
                 See Full Curriculum
               </Button>
-              <Button variant="ghost" size="lg">
+              {/* <Button variant="ghost" size="lg">
                 <Calendar className="w-5 h-5 mr-2" />
                 Join Info Session
-              </Button>
+              </Button> */}
             </div>
           </div>
           
